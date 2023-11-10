@@ -24,7 +24,37 @@ public:
     }
 };
 
-class Ingredient {};
+class Ingredient {
+private:
+    char* name = nullptr;
+    int nameLength = 0;
+    int qty = 0;
+public:
+    Ingredient() {};
+    Ingredient (const char* name, int qty) {
+        if (name != nullptr) {
+            this->name = new char[strlen(name) + 1];
+            strcpy(this->name, name);
+            this->nameLength = strlen(name);
+        }
+        if (qty > 0) this->qty = qty;
+    }
+    ~Ingredient() {
+        if (this->name != nullptr) {
+            delete[] this->name;
+        }
+    }
+    const char* getName() {
+        return this->name;
+    }
+
+    friend ostream& operator<<(ostream& ost, Ingredient& ing) {
+        ost << "\n----------\n";
+        ost << "Ingredient " << ing.name << ". Kilos in stock: " << ing.qty;
+        ost << "\n----------\n";
+        return ost;
+    }
+};
 
 class Order {};
 
@@ -37,5 +67,7 @@ int main()
     while (cmdLineParser.isRunning()) {
         cmdLineParser.parseLine();
     }
+    Ingredient tomato("Tomato", 10);
+    cout << tomato;
     return 0;
 }
