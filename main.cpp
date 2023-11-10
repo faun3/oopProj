@@ -56,6 +56,13 @@ public:
     }
 };
 
+class MenuItem {
+    char* menuItemName;
+    
+};
+
+class Menu {};
+
 class Order {};
 
 string Parser::cmdOptions = "\nWelcome!\nYou can look at the menu using \"menu\".\nCheck out our currently available ingredients using \"stock\".\nAdd items to your order with \"order add <item name> <item quanitity>\".\nSee your current order using \"order show\".\nShow this screen again by typing the \"help\" command.\nYou can leave the restaurant using the \"quit\" command.\n\n";
