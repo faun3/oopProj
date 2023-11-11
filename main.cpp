@@ -27,7 +27,6 @@ public:
 class Ingredient {
 private:
     char* name = nullptr;
-    int nameLength = 0;
     int qty = 0;
 public:
     Ingredient() {};
@@ -35,7 +34,6 @@ public:
         if (name != nullptr) {
             this->name = new char[strlen(name) + 1];
             strcpy(this->name, name);
-            this->nameLength = strlen(name);
         }
         if (qty > 0) this->qty = qty;
     }
@@ -57,13 +55,70 @@ public:
 };
 
 class MenuItem {
-    char* menuItemName;
-    
+private:
+    char* menuItemName = nullptr;
+    typedef struct neccesaries {
+        Ingredient ingreedient;
+        int neceesaryQty;   
+    };
+    neccesaries needs[15];
+    int needsLenght = 0;
+public:
+    MenuItem() {}
+    MenuItem() {
+
+    }
+    void printItemAndNecessaries() {}
+    friend ostream& operator<<(ostream& ost, MenuItem mi) {
+        if (mi.menuItemName != nullptr) {
+            ost << mi.menuItemName << "\n";
+        }
+        else {
+            ost << "This menu item doesn't seem to have a name yet!\n";
+        }
+        return ost;
+    }
+
 };
 
-class Menu {};
+class Menu {
+private:
+    MenuItem* menuItems;
+    int menuLength;
+public:
+    friend ostream& operator<<(ostream& ost, Menu menu){
+        if (menu.menuItems != nullptr && menu.menuLength != 0) {
+            for (int i = 0; i < menu.menuLength; i++) {
+                ost << "\n-----\n" << menu.menuItems[i] << "\n-----\n";
+            }
+        }
+        else {
+            ost << "\n-----" << "\nThere doesn't seem to be anything on the menu just yet!\n-----\n";
+        }
+        return ost;
+    }
+};
 
-class Order {};
+class Stock {
+private:
+    Ingredient* ingredients = nullptr;
+    int ingredientsLen = 0;
+public:
+    void push(Ingredient ing) {
+        Ingredient* newIng = new Ingredient[ingredientsLen + 1];
+        for (int i = 0; i < ingredientsLen; i++) {
+            newIng[i] = this->ingredients[i];
+        }
+        newIng[ingredientsLen] = ing;
+
+    }
+};
+
+class Order {
+private:
+    MenuItem* currentlyOrdered = nullptr;
+    int currentOrderLen = 0;
+};
 
 string Parser::cmdOptions = "\nWelcome!\nYou can look at the menu using \"menu\".\nCheck out our currently available ingredients using \"stock\".\nAdd items to your order with \"order add <item name> <item quanitity>\".\nSee your current order using \"order show\".\nShow this screen again by typing the \"help\" command.\nYou can leave the restaurant using the \"quit\" command.\n\n";
 
