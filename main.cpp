@@ -225,6 +225,9 @@ int main()
     Ingredient tomato("Tomato", 10);
     Ingredient cheese("Cheese", 15);
     Ingredient dough("Dough", 20);
+    Ingredient mushrooms("Mushrooms", 5);
+    Ingredient ham("Ham", 25);
+    Ingredient olives("Olives", 10);
     cout << tomato << " " << cheese << " " << dough;
     Stock stock;
     stock.push(tomato);
@@ -234,6 +237,15 @@ int main()
     stock.push(tomato);
     Ingredient dough2("Dough", 100);
     stock.push(dough2);
+    Ingredient marghNeeded[] = {tomato, cheese, dough};
+    Ingredient qStagioni[] = {tomato, cheese, dough, ham, mushrooms, olives};
+    MenuItem margherita("Margherita", marghNeeded, 3);
+    MenuItem quattroStagioni("Quattro Stagioni", qStagioni, 6);
     cout << stock;
+    cout << "\nMargherita Menu Item:\n";
+    cout << margherita;
+    cout << "\nQuattro Stagioni Menu Item:\n";
+    cout << quattroStagioni;
+    // Menu menu;
     return 0;
 }
