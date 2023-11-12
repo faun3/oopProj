@@ -204,6 +204,7 @@ public:
         this->menuLength++;
         delete[] this->menuItems;
         this->menuItems = newMenuItems;
+        newMenuItems = nullptr;
     }
 };
 
@@ -383,11 +384,13 @@ int main()
     Ingredient qStagioni[] = {tomato, cheese, dough, ham, mushrooms, olives};
     MenuItem margherita("Margherita", marghNeeded, 3);
     MenuItem quattroStagioni("Quattro", qStagioni, 6);
+    MenuItem test = quattroStagioni;
     cout << stock;
     cout << "\nMargherita Menu Item:\n";
     cout << margherita;
     cout << "\nQuattro Stagioni Menu Item:\n";
     cout << quattroStagioni;
+
     Menu menu;
     cout << menu;
     menu.push(margherita);
