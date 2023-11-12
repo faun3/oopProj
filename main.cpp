@@ -1,6 +1,7 @@
 #include <iostream>
 using namespace std;
 
+
 // STUFF THAT WORKS
 // - parsing the first letter of user input
 // 
@@ -81,14 +82,15 @@ public:
 
 class MenuItem {
 private:
-    char* menuItemName = nullptr;
+    string menuItemName = "";
     Ingredient* ingredientsNeeded = nullptr;
     int ingredientsNeededLen = 0;
 public:
     MenuItem() {}
-    MenuItem(char* name, Ingredient* ingNeeded, int ingNeededLen) {
-        this->menuItemName = new char[strlen(name) + 1];
-        strcpy(this->menuItemName, name);
+    MenuItem(string name, Ingredient* ingNeeded, int ingNeededLen) {
+        if (name != "" && name.size() > 0) {
+            this->menuItemName = name;
+        }
         if (ingNeeded != nullptr && ingNeededLen > 0) {
             this->ingredientsNeeded = new Ingredient[ingNeededLen];
             this->ingredientsNeededLen = ingNeededLen;
@@ -98,9 +100,8 @@ public:
         }
     }
     MenuItem(const MenuItem& menuItm) {
-        if (menuItm.menuItemName != nullptr) {
-            this->menuItemName = new char[strlen(menuItm.menuItemName) + 1];
-            strcpy(this->menuItemName, menuItm.menuItemName);
+        if (menuItm.menuItemName != "" && menuItm.menuItemName.size() > 0) {
+            this->menuItemName = menuItm.menuItemName;
         }
         if (menuItm.ingredientsNeeded != nullptr && menuItm.ingredientsNeededLen > 0) {
             this->ingredientsNeededLen = menuItm.ingredientsNeededLen;
@@ -110,9 +111,11 @@ public:
             }
         }
     }
-    void printMenuItem() {}
+    string getMenuItemName() {
+        return this->menuItemName;
+    }
     friend ostream& operator<<(ostream& ost, MenuItem mi) {
-        if (mi.menuItemName != nullptr) {
+        if (mi.menuItemName != "") {
             ost << mi.menuItemName << "\n";
         }
         else {
@@ -130,8 +133,9 @@ private:
 public:
     friend ostream& operator<<(ostream& ost, Menu menu){
         if (menu.menuItems != nullptr && menu.menuLength != 0) {
+            ost << "Our menu includes:\n";
             for (int i = 0; i < menu.menuLength; i++) {
-                ost << "\n-----\n" << menu.menuItems[i] << "\n-----\n";
+                ost << "-----\n" << menu.menuItems[i] << "-----\n";
             }
         }
         else {
@@ -144,11 +148,30 @@ public:
     }
     const MenuItem*& getMenu() {
     }
-    bool isInMenu(string itemName) {
-        if (this->menuItems == nullptr) return false;
+    // strange error here if string isn't ::'d to std
+    bool isInMenu(std::string itemName) {
+        if (this->menuItems == nullptr || this->menuLength == 0) return false;
         else {
-
+            for (int i = 0; i < this->menuLength; i++) {
+                if (this->menuItems[i].getMenuItemName() == itemName) {
+                    return true;
+                }
+            }
+            return false;
         }
+    }
+    void push(MenuItem mit) {
+        if (this->isInMenu(mit.getMenuItemName())) return;
+        MenuItem* newMenuItems = new MenuItem[this->menuLength + 1];
+        for (int i = 0; i < this->menuLength; i++) {
+            //TODO: need a copy constructor for pretty much everything
+            newMenuItems[i] = this->menuItems[i];
+        }
+        newMenuItems[this->menuLength] = mit;
+        this->menuLength++;
+        delete[] this->menuItems;
+        this->menuItems = newMenuItems;
+        newMenuItems = nullptr;
     }
 };
 
@@ -246,6 +269,12 @@ int main()
     cout << margherita;
     cout << "\nQuattro Stagioni Menu Item:\n";
     cout << quattroStagioni;
-    // Menu menu;
+    Menu menu;
+    cout << menu;
+    menu.push(margherita);
+    menu.push(quattroStagioni);
+    cout << menu;
+    menu.push(margherita);
+    cout << menu;
     return 0;
 }
