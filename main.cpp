@@ -17,6 +17,11 @@ class Parser {
 private:
     static string cmdOptions;
     bool running = true;
+    // cheap trick to add a dynamically allocated field in this class too
+    // not implemented yet, will be pretty useless even when it's done 
+    std::string* commandHistory = nullptr;
+    int commandHistoryLen = 0;
+    int MAX_HISTORY = 100;
 public:
     bool isRunning () {return running;}
     void showMenu() {
