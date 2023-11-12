@@ -147,6 +147,17 @@ private:
     int menuLength = 0;
 public:
     Menu() {}
+    Menu(const Menu& other) {
+        if (other.menuItems != nullptr && other.menuLength > 0) {
+            delete[] this->menuItems;
+            this->menuItems = nullptr;
+            this->menuLength = other.menuLength;
+            this->menuItems = new MenuItem[this->menuLength];
+            for (int i = 0; i < this->menuLength; i++) {
+                this->menuItems[i] = other.menuItems[i];
+            }
+        }
+    }
     ~Menu() {
         if (menuItems != nullptr && menuLength > 0) {
             delete[] menuItems;
@@ -184,6 +195,7 @@ public:
     void push(MenuItem mit) {
         if (this->isInMenu(mit.getMenuItemName())) return;
         MenuItem* newMenuItems = new MenuItem[this->menuLength + 1];
+        
         for (int i = 0; i < this->menuLength; i++) {
             //TODO: need a copy constructor for pretty much everything
             newMenuItems[i] = this->menuItems[i];
@@ -192,7 +204,6 @@ public:
         this->menuLength++;
         delete[] this->menuItems;
         this->menuItems = newMenuItems;
-        newMenuItems = nullptr;
     }
 };
 
@@ -201,6 +212,20 @@ private:
     Ingredient* ingredients = nullptr;
     int ingredientsLen = 0;
 public:
+    Stock() {
+        this->ingredients = nullptr;
+        this->ingredientsLen = 0;
+    }
+    Stock(const Stock& other) {
+        if (other.ingredients != nullptr && other.ingredientsLen > 0) {
+            delete[] this->ingredients;
+            this->ingredientsLen = other.ingredientsLen;
+            this->ingredients = new Ingredient[ingredientsLen];
+            for (int i = 0; i < this->ingredientsLen; i++) {
+                this->ingredients[i] = other.ingredients[i];
+            }
+        }
+    }
     ~Stock() {
         if (this->ingredients != nullptr) {
             delete[] ingredients;
