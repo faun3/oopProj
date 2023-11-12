@@ -1,6 +1,7 @@
 #include <iostream>
+#include <sstream>
+#include <string>
 using namespace std;
-
 
 // STUFF THAT WORKS
 // - parsing the first letter of user input
@@ -30,14 +31,48 @@ public:
     void parseLine() {
         string userInput;
         getline(cin, userInput);
-        string firstWord = userInput.substr(0, userInput.find(" "));
+        istringstream iss(userInput);
+        // string firstWord = userInput.substr(0, userInput.find(" "));
+        string firstWord;
+        iss >> firstWord;
         if (firstWord == "help") {
             showMenu();   
+        }
+        else if (firstWord == "stock") {
+            // print stocks here
         }
         else if (firstWord == "quit") {
             running = false;
         }
-        // cout << "\n" << firstWord << '\n';
+        else if (firstWord == "order"){
+            string secondWord;
+            iss >> secondWord;
+            if (secondWord == "show") {
+                // print order here
+            }
+            else if (secondWord == "place") {
+                // place the order here
+            }
+            else if (secondWord == "add") {
+                string itemName;
+                string itemQtyAsString;
+                iss >> itemName >> itemQtyAsString;
+                int itemQty;
+                try {
+                itemQty = stoi(itemQtyAsString);
+                    if (itemQty <= 0) {
+                        cout << "\nNothing to be added! Try using a positive, integer quantity!\n";
+                    }
+                    else {
+                        cout << "\nYou added " << itemName << " " << itemQty << " times.\n";
+                    }
+                }
+                catch (invalid_argument) {
+                    cout << "\nNothing to be added! Try using a positive, integer quantity!\n";
+                    itemQty = 0;
+                }
+            }
+        }
     }
 };
 
@@ -241,7 +276,7 @@ public:
     }
 };
 
-string Parser::cmdOptions = "\nWelcome!\nYou can look at the menu using \"menu\".\nCheck out our currently available ingredients using \"stock\".\nAdd items to your order with \"order add <item name> <item quanitity>\".\nSee your current order using \"order show\".\nShow this screen again by typing the \"help\" command.\nYou can leave the restaurant using the \"quit\" command.\n\n";
+string Parser::cmdOptions = "\nWelcome!\nYou can look at the menu using \"menu\".\nCheck out our currently available ingredients using \"stock\".\nAdd items to your order with \"order add <item name> <item quanitity>\".\nSee your current order using \"order show\".\nPlace your order using \"order place\".\nShow this screen again by typing the \"help\" command.\nYou can leave the restaurant using the \"quit\" command.\n\n";
 
 int main() 
 {
