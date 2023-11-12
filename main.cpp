@@ -1,6 +1,17 @@
 #include <iostream>
 using namespace std;
 
+// STUFF THAT WORKS
+// - parsing the first letter of user input
+// 
+// WHAT NEEDS TO WORK
+// - command line tool to add a menu item to the current order (with quanity)
+// - create a MenuItem using Ingredients
+// - push a MenuItem to the Menu
+// - check if a string matches the name of a MenuItem in the Menu (used for the Order)
+// - print the Order
+// - add stuff to the Order
+
 class Parser {
 private:
     static string cmdOptions;
@@ -38,9 +49,12 @@ public:
         if (qty > 0) this->qty = qty;
     }
     ~Ingredient() {
-        if (this->name != nullptr) {
-            delete[] this->name;
-        }
+        // you don't need to do this for char arrays I guess?
+        // leaving this in gets me a double free error for some reason
+
+        // if (this->name != nullptr) {
+        //     delete[] this->name;
+        // }
     }
     const char* getName() {
         return this->name;
@@ -96,7 +110,7 @@ public:
             }
         }
     }
-    void printItemAndNecessaries() {}
+    void printMenuItem() {}
     friend ostream& operator<<(ostream& ost, MenuItem mi) {
         if (mi.menuItemName != nullptr) {
             ost << mi.menuItemName << "\n";
@@ -143,19 +157,42 @@ private:
     Ingredient* ingredients = nullptr;
     int ingredientsLen = 0;
 public:
+    ~Stock() {
+        if (this->ingredients != nullptr) {
+            delete[] ingredients;
+        }
+    }
     void push(Ingredient ing) {
+        // check by name if the element is already present in the list
         if (this->ingredients != nullptr && this->ingredientsLen != 0) {
             for (int i = 0; i < this->ingredientsLen; i++) {
                 if (strcmp(this->ingredients[i].getName(), ing.getName()) == 0) {
-                    this->ingredients[i].
+                    //if yes, add the qty to the already existing qty
+                    this->ingredients[i].setQty(this->ingredients[i].getQty() + ing.getQty());
+                    // then return
+                    return;
                 }
             }
         }
-        Ingredient* newIng = new Ingredient[ingredientsLen + 1];
-        for (int i = 0; i < ingredientsLen; i++) {
+        // if the element is not present in the array, we push it onto the array
+        Ingredient* newIng = new Ingredient[this->ingredientsLen + 1];
+        for (int i = 0; i < this->ingredientsLen; i++) {
             newIng[i] = this->ingredients[i];
         }
         newIng[ingredientsLen] = ing;
+        this->ingredientsLen++;
+        delete[] this->ingredients;
+        this->ingredients = newIng;
+        newIng = nullptr;
+    }
+    friend ostream& operator<<(ostream& ost, Stock& stock) {
+        ost << "\n";
+        ost << "Current stocks are:\n";
+        for (int i = 0; i < stock.ingredientsLen; i++) {
+            ost << stock.ingredients[i] << " ";
+        }
+        ost << "\n";
+        return ost;
     }
 };
 
@@ -186,6 +223,17 @@ int main()
         cmdLineParser.parseLine();
     }
     Ingredient tomato("Tomato", 10);
-    cout << tomato;
+    Ingredient cheese("Cheese", 15);
+    Ingredient dough("Dough", 20);
+    cout << tomato << " " << cheese << " " << dough;
+    Stock stock;
+    stock.push(tomato);
+    stock.push(cheese);
+    stock.push(dough);
+    cout << stock;
+    stock.push(tomato);
+    Ingredient dough2("Dough", 100);
+    stock.push(dough2);
+    cout << stock;
     return 0;
 }
