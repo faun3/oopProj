@@ -18,9 +18,15 @@ public:
         }
     }
     Ingredient (const Ingredient& other) {
-        name = new char[strlen(other.name) + 1];
-        strcpy(name, other.name);
-        qty = other.qty;
+        if (other.name != nullptr && strlen(other.name) > 0) {
+            name = new char[strlen(other.name) + 1];
+            strcpy(name, other.name);
+            qty = other.qty;
+        }
+        else {
+            name = nullptr;
+            qty = 0;
+        }
     }
     ~Ingredient() {
         delete[] name;
@@ -28,7 +34,7 @@ public:
     Ingredient& operator=(const Ingredient& other) {
         if (this != &other) {
             delete[] name;
-            if (other.name != nullptr) {
+            if (other.name != nullptr && strlen(other.name) > 0) {
                 name = new char[strlen(other.name) + 1];
                 strcpy(name, other.name);
             }
@@ -59,15 +65,17 @@ private:
 public:
     MenuItem () {}
     MenuItem(string name, Ingredient* ingredients, int size) {
-        if (name != "") {
-            this->name = name;
-        }
+        this->name = name;
         if (ingredients != nullptr && size > 0) {
             this->ingredients = new Ingredient[size];
             for (int i = 0; i < size; i++) {
                 this->ingredients[i] = ingredients[i];
             }
             this->size = size;
+        }
+        else {
+            this->ingredients = nullptr;
+            this->size = 0;
         }
     }
     MenuItem(const MenuItem& other) {
@@ -108,9 +116,9 @@ public:
     }
     friend ostream& operator<<(ostream& out, const MenuItem& m) {
         if (m.ingredients != nullptr) {
-            out << m.name << ": ";
+            out << "Menu item - " << m.name << ":\n";
             for (int i = 0; i < m.size; i++) {
-                out << m.ingredients[i] << " ";
+                out << m.ingredients[i];
             }
             out << "\n";
         }
@@ -164,8 +172,9 @@ public:
     friend ostream& operator<< (ostream& ost, const Stock& stock) {
         if (stock.ingredients != nullptr) {
             if (stock.size > 0) {
+                ost << "Stock:\n";
                 for (int i = 0; i < stock.size; i++) {
-                    ost << stock.ingredients[i] << " ";
+                    ost << stock.ingredients[i];
                 }
                 ost << "\n";
             }
@@ -177,38 +186,29 @@ public:
 int main() {
     Ingredient i1("flour", 100);
     Ingredient i2("tomatoes", 50);
-    cout << i1 << " " << i2;
-    cout << "\n";
-    cout << i2 << "\n";
+    Ingredient i4("ham", 60);
+    // cout << i1 << " " << i2;
+    // cout << "\n";
+    // cout << i2 << "\n";
     Ingredient i3;
-    cout << i3;
+    // cout << i3;
     
-    Stock stock;
-    stock.push(i1);
-    cout << stock;
-    stock.push(i2);
-    cout << stock;
-    stock.push(i3);
-    cout << stock;
+    // Stock stock;
+    // stock.push(i1);
+    // cout << stock;
+    // stock.push(i2);
+    // cout << stock;
+    // stock.push(i3);
+    // cout << stock;
 
-    MenuItem m1;
-    Ingredient stuff[] = {i1, i2};
-    MenuItem m2("Pizza", stuff, 2);
-    MenuItem m3;
+    // including a default constructed object in this array leads to a segfault
+    // no idea why -- yes idea why
+    // the copy constructor was wrong
+    // (if other.array was nullptr it still allocated memory instead of setting this.array to nullptr)
 
-    cout << m1;
-
+    Ingredient stuff[] = {i1, i2, i3};
+    MenuItem m2("Pizza", stuff, 3);
     cout << m2;
-
-    cout << m3;
     
-    m3 = m1;
-    
-    cout << m3;
-
-    m1 = m2;
-
-    cout << m1;
-
     return 0;
 }
