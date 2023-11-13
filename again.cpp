@@ -207,7 +207,7 @@ public:
         // don't push anything if the menu item has an empty name, an empty ingredient list, or a null ingredient list
 
         if (m.getName() == "" || m.getIngredients() == nullptr || m.getSize() == 0) {
-            cout << "\nDEBUG ONLY: pushed MenuItem has an empty name, an empty ingredient list, or a null ingredient list\n";
+            // cout << "\nDEBUG ONLY: pushed MenuItem has an empty name, an empty ingredient list, or a null ingredient list\n";
             return;
         }
         // don't push anything if the item already exists
@@ -239,6 +239,91 @@ public:
         // don't forget to return ost when you overload <<
         // or you'll get a trace trap error :(
         return out;
+    }
+};
+
+class Order {
+private:
+    MenuItem* items = nullptr;
+    int size = 0;
+public:
+    Order() {}
+    Order(const Order& other) {
+        if (other.items != nullptr && other.size > 0) {
+            size = other.size;
+            delete[] items;
+            items = new MenuItem[size];
+            for (int i = 0; i < size; i++) {
+                items[i] = other.items[i];
+            }
+        }
+        else {
+            items = nullptr;
+            size = 0;
+        }
+    }
+    ~Order () {
+        if (this->items != nullptr) {
+            delete[] this->items;
+        }
+    }
+    Order& operator=(const Order& other) {
+        if (this != &other) {
+            if (other.items != nullptr && other.size > 0) {
+                size = other.size;
+                delete[] items;
+                items = new MenuItem[size];
+                for (int i = 0; i < size; i++) {
+                    items[i] = other.items[i];
+                }
+            }
+            else {
+                this->items = nullptr;
+                this->size = 0;
+            }
+        }
+        return *this;
+    }
+    friend ostream& operator<<(ostream& out, const Order& o) {
+        if (o.items != nullptr && o.size > 0) {
+            out << "Order:\n";
+            for (int i = 0; i < o.size; i++) {
+                out << o.items[i];
+            }
+        }
+        else {
+            out << "This order is empty!\n";
+        }
+        return out;
+    }
+    bool isInOrders(string itemName) {
+        if (itemName == "") {
+            return false;
+        }
+        if (this->size <= 0 || this->items == nullptr) {
+            return false;
+        }
+        else {
+            for (int i = 0; i < this->size; i++) {
+                if (this->items[i].getName() == itemName) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+    void push(MenuItem& m) {
+        if (this->isInOrders(m.getName())) {
+            return;
+        }
+        MenuItem* temp = new MenuItem[this->size + 1];
+        for (int i = 0; i < this->size; i++) {
+            temp[i] = this->items[i];
+        }
+        temp[this->size] = m;
+        this->size++;
+        delete[] this->items;
+        this->items = temp;
     }
 };
 
@@ -329,13 +414,14 @@ int main() {
     Menu menu;
     menu.push(m3);
     cout << menu;
-    MenuItem mEmpty;
-    MenuItem mBlank("", stuff2, 6);
-    MenuItem mBlank2("Hello", stuff2, -1);
-    MenuItem mBlank3("NothingPizza", nullptr, 5);
-    menu.push(mBlank);
-    menu.push(mBlank2);
-    menu.push(mBlank3);
-    cout << menu;
+
+    Order order;
+    cout << order;
+
+    order.push(m3);
+    cout << order;
+
+    order.push(m3);
+    cout << order;
     return 0;
 }
