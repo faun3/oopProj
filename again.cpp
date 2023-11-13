@@ -5,11 +5,6 @@ using namespace std;
 // TODO:
 // Reimplement Parser as a controller class
 // Think of a solution for parsing multi-word named menu items from user input
-// FIXME:
-// FIXME:
-// Order class doesn't keep track of the number of ordered items - maybe make a new class called OrderItem which holds the MenuItem and its Quanity so that Order can hold an array or OrderItems instead
-    // this would also mean that the push method, copy constructor, copy assignment and destructor need to be changed
-    // when the push method finds an element that already exists in the array, it should increment the quantity of that item instead of skipping it
 
 class Ingredient {
 private:
@@ -252,9 +247,15 @@ public:
     }
 };
 
+struct OrderItem
+{
+    MenuItem item;
+    int qty;
+};
+
 class Order {
 private:
-    MenuItem* items = nullptr;
+    OrderItem* items = nullptr;
     int size = 0;
 public:
     Order() {}
@@ -262,7 +263,7 @@ public:
         if (other.items != nullptr && other.size > 0) {
             size = other.size;
             delete[] items;
-            items = new MenuItem[size];
+            items = new OrderItem[size];
             for (int i = 0; i < size; i++) {
                 items[i] = other.items[i];
             }
@@ -282,7 +283,7 @@ public:
             if (other.items != nullptr && other.size > 0) {
                 size = other.size;
                 delete[] items;
-                items = new MenuItem[size];
+                items = new OrderItem[size];
                 for (int i = 0; i < size; i++) {
                     items[i] = other.items[i];
                 }
@@ -298,7 +299,7 @@ public:
         if (o.items != nullptr && o.size > 0) {
             out << "Order:\n";
             for (int i = 0; i < o.size; i++) {
-                out << o.items[i];
+                out << o.items[i].item.getName() << " " << o.items[i].qty << "\n";
             }
         }
         else {
@@ -306,36 +307,47 @@ public:
         }
         return out;
     }
-    bool isInOrders(string itemName) {
+    // -1 for not found
+    // index of item in array otherwise
+    int isInOrders(string itemName) {
         if (itemName == "") {
-            return false;
+            return -1;
         }
         if (this->size <= 0 || this->items == nullptr) {
-            return false;
+            return -1;
         }
         else {
             for (int i = 0; i < this->size; i++) {
-                if (this->items[i].getName() == itemName) {
-                    return true;
+                if (this->items[i].item.getName() == itemName) {
+                    return i;
                 }
             }
-            return false;
+            return -1;
         }
     }
     void push(MenuItem& m) {
-        if (this->isInOrders(m.getName())) {
-            return;
+        int isInOrders = this->isInOrders(m.getName());
+        if (isInOrders != -1) {
+            this->items[isInOrders].qty++;
         }
-        MenuItem* temp = new MenuItem[this->size + 1];
-        for (int i = 0; i < this->size; i++) {
-            temp[i] = this->items[i];
+        else {
+            OrderItem* temp = new OrderItem[this->size + 1];
+            for (int i = 0; i < this->size; i++) {
+                temp[i] = this->items[i];
+            }
+            OrderItem tempItem;
+            tempItem.item = m;
+            tempItem.qty = 1;
+            temp[this->size] = tempItem;
+            this->size++;
+            delete[] this->items;
+            this->items = temp;
         }
-        temp[this->size] = m;
-        this->size++;
-        delete[] this->items;
-        this->items = temp;
     }
 };
+
+
+
 
 class Stock {
 private:
@@ -432,6 +444,9 @@ int main() {
     cout << order;
 
     order.push(m3);
+    cout << order;
+    
+    order.push(m2);
     cout << order;
     return 0;
 }
