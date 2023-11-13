@@ -5,6 +5,10 @@ using namespace std;
 // TODO:
 // Reimplement Parser as a controller class
 // Think of a solution for parsing multi-word named menu items from user input
+// FIXME:
+// FIXME:
+
+
 
 class Ingredient {
 private:
@@ -326,6 +330,9 @@ public:
         }
     }
     void push(MenuItem& m) {
+        if (m.getName() == "" || m.getIngredients() == nullptr || m.getSize() == 0) {
+            return;
+        }
         int isInOrders = this->isInOrders(m.getName());
         if (isInOrders != -1) {
             this->items[isInOrders].qty++;
@@ -447,6 +454,9 @@ int main() {
     cout << order;
     
     order.push(m2);
+    cout << order;
+
+    order.push(m5);
     cout << order;
     return 0;
 }
