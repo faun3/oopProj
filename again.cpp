@@ -28,8 +28,11 @@ public:
     Ingredient& operator=(const Ingredient& other) {
         if (this != &other) {
             delete[] name;
-            name = new char[strlen(other.name) + 1];
-            strcpy(name, other.name);
+            if (other.name != nullptr) {
+                name = new char[strlen(other.name) + 1];
+                strcpy(name, other.name);
+            }
+            else name = nullptr;
         }
         qty = other.qty;
         return *this;
@@ -48,6 +51,76 @@ public:
     }
 };
 
+class MenuItem {
+private:
+    Ingredient* ingredients = nullptr;
+    int size = 0;
+    string name = "";
+public:
+    MenuItem () {}
+    MenuItem(string name, Ingredient* ingredients, int size) {
+        if (name != "") {
+            this->name = name;
+        }
+        if (ingredients != nullptr && size > 0) {
+            this->ingredients = new Ingredient[size];
+            for (int i = 0; i < size; i++) {
+                this->ingredients[i] = ingredients[i];
+            }
+            this->size = size;
+        }
+    }
+    MenuItem(const MenuItem& other) {
+        if (other.ingredients != nullptr) {
+            size = other.size;
+            ingredients = new Ingredient[size];
+            for (int i = 0; i < size; i++) {
+                ingredients[i] = other.ingredients[i];
+            }
+        }
+    }
+    ~MenuItem() {
+        if (ingredients != nullptr) {
+            delete[] ingredients;
+        }
+    }
+    // TODO:
+    // all copy assignment operators should check if other.array is nullptr
+    // if it's not, deep copy the array
+    // if it is, set this.array to nullptr to avoid double frees
+    MenuItem& operator=(MenuItem& other) {
+        if (this != &other) {
+            if (other.name != "") {
+                this->name = other.name;
+            }
+            else this->name = "";
+            delete[] ingredients;
+            size = other.size;
+            if (other.ingredients != nullptr) {
+                ingredients = new Ingredient[size];
+                for (int i = 0; i < size; i++) {
+                    ingredients[i] = other.ingredients[i];
+                }
+            }
+            else ingredients = nullptr;
+        }
+        return *this;
+    }
+    friend ostream& operator<<(ostream& out, const MenuItem& m) {
+        if (m.ingredients != nullptr) {
+            out << m.name << ": ";
+            for (int i = 0; i < m.size; i++) {
+                out << m.ingredients[i] << " ";
+            }
+            out << "\n";
+        }
+        else {
+            out << "This item doesn't have any ingredients yet!\n";
+        }
+        return out;
+    }
+};
+
 class Stock {
 private:
     Ingredient* ingredients = nullptr;
@@ -55,11 +128,16 @@ private:
 public:   
     Stock() {}
     Stock(const Stock& other) {
-        size = other.size;
-        ingredients = new Ingredient[size];
-        for (int i = 0; i < size; i++) {
-            ingredients[i] = other.ingredients[i];
+        if (other.size > 0) {
+            size = other.size;
         }
+        if (other.ingredients != nullptr) {
+            ingredients = new Ingredient[size];
+            for (int i = 0; i < size; i++) {
+                ingredients[i] = other.ingredients[i];
+            }
+        }
+        else ingredients = nullptr;
     }
     ~Stock() {
         if (ingredients != nullptr) {
@@ -104,6 +182,7 @@ int main() {
     cout << i2 << "\n";
     Ingredient i3;
     cout << i3;
+    
     Stock stock;
     stock.push(i1);
     cout << stock;
@@ -111,5 +190,25 @@ int main() {
     cout << stock;
     stock.push(i3);
     cout << stock;
+
+    MenuItem m1;
+    Ingredient stuff[] = {i1, i2};
+    MenuItem m2("Pizza", stuff, 2);
+    MenuItem m3;
+
+    cout << m1;
+
+    cout << m2;
+
+    cout << m3;
+    
+    m3 = m1;
+    
+    cout << m3;
+
+    m1 = m2;
+
+    cout << m1;
+
     return 0;
 }
