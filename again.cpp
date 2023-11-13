@@ -61,7 +61,7 @@ public:
         }
         return out;
     }
-    const char* getName() const {
+    const char* getName() {
         return name;
     }
     int getQty() const {
@@ -73,6 +73,15 @@ public:
         }
         else this->qty = newQty;
     }
+    Ingredient& operator++(){
+    }
+    Ingredient operator+(int extraQty) {
+		if (extraQty > 0) {
+			Ingredient res = *this;
+			res.qty += extraQty;
+			return res;
+		}
+	}
 };
 
 class MenuItem {
@@ -148,7 +157,7 @@ public:
     string getName() const{
         return name;
     }
-    const Ingredient* getIngredients() {
+    Ingredient* getIngredients() {
         return this->ingredients;
     }
     int getSize() {
@@ -394,7 +403,7 @@ public:
             delete[] ingredients;
         }
     }
-    void push(const Ingredient& i) {
+    void push(Ingredient& i) {
         // pushing an item with a null name
         // will segfault
         //
@@ -423,28 +432,33 @@ public:
         } 
         return ost;
     }
-    // this is horrible
-    void reduceStock (Order& o) {
-        if (this->ingredients == nullptr || this->size == 0) {
-            return;
+    int findByName(const char* name) {
+        if (name == nullptr) {
+            return -1;
         }
-        if (o.getItems() != nullptr && o.getSize() > 0) {
-            // loop through every OrderItem in the Order
-            for (int i = 0; i < o.getSize(); i++) {
-                // loop through every Ingredient in the Stock
-                for (int j = 0; j < this->size; j++) {
-                    // if the name of the OrderItem matches the name of the Ingredient
-                    if (strcmp(o.getItems()[i].item.getIngredients()[j].getName(), this->ingredients[j].getName())) {
-                        // if the quantity of the Ingredient is less than the quantity of the OrderItem
-                        if (this->ingredients[j].getQty() < o.getItems()[i].qty) {
-                            // throw an error
-                            throw new runtime_error("Not enough ingredients in stock!");
-                        }
-                        // otherwise
-                        else {
-                            // reduce the quantity of the Ingredient by the quantity of the OrderItem
-                            this->ingredients[j].setQty(this->ingredients[j].getQty() - o.getItems()[i].qty * o.getItems()[i].item.getIngredients()[j].getQty());
-                        }
+        else {
+            if (this->ingredients == nullptr || this->size == 0) {
+                return -1;
+            }
+            else {
+                for (int i = 0; i < this->size; i++){
+                    if (strcmp(this->ingredients[i].getName(), name) == 0) {
+                        return i;
+                    }
+                }
+            }
+        }
+    }
+    void reduceStock(Order& order) {
+        for (int i = 0; i < order.getSize(); i++) {
+            for (int j = 0; j < order.getItems()[i].item.getSize(); j++) {
+                int idx = this->findByName(order.getItems()[i].item.getIngredients()[j].getName()) == -1; 
+                if (idx == -1) {
+                    throw new runtime_error("Order cannot be completed! One of the ingredients in your order was never part of our stocks!");
+                }
+                else {
+                    if (idx != -1) {
+                        this->ingredients[idx].setQty(this->ingredients[idx].getQty() - order.getItems()[i].item.getIngredients()[j].getQty() * order.getItems()[i].qty);
                     }
                 }
             }
@@ -455,6 +469,8 @@ public:
 int main() 
 {
     Ingredient i1("flour", 100);
+    cout << i1 << "\n";
+    cout << i1 + 10 << "\n";
     Ingredient i2("tomatoes", 50);
     Ingredient i4("ham", 60);
     Ingredient i5("cheese", 40);
