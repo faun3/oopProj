@@ -127,6 +127,15 @@ public:
         }
         return out;
     }
+    string getName() {
+        return name;
+    }
+    const Ingredient* getIngredients() {
+        return ingredients;
+    }
+    int getSize() {
+        return size;
+    }
 };
 
 class Menu {
@@ -135,8 +144,77 @@ private:
     int size = 0;
 public:
     Menu() {}
-    Menu(const Menu& other) {}
-    ~Menu() {}
+    Menu(const Menu& other) {
+        if (other.items != nullptr && other.size > 0) {
+            // TODO:
+            // all copy constructor steps should be the following
+            // 1. check if other.array is nullptr
+            //  1.1 if yes, set this.array to nullptr and this.size to 0
+            // 1.2 if no, deep copy the array and size into this
+            this->size = other.size;
+            delete[] this->items;
+            this->items = nullptr;
+            this->items = new MenuItem[size];
+            for (int i = 0; i < size; i++) {
+                this->items[i] = other.items[i];
+            }
+        }
+        else {
+            this->items = nullptr;
+            this->size = 0;
+        }
+    }
+    ~Menu() {
+        if (this->items != nullptr) {
+            delete[] items;
+        }
+    }
+    Menu& operator=(const Menu& other) {
+        if (other.items != nullptr && other.size > 0) {
+            size = other.size;
+            delete[] items;
+            items = new MenuItem[size];
+            for (int i = 0; i < size; i++) {
+                items[i] = other.items[i];
+            }
+        }
+        else {
+            this->items = nullptr;
+            this->size = 0;
+        }
+    }
+    bool isInMenu(string menuItemName) {
+        // MenuItems with empty names are not included in any menu
+        if (menuItemName == "") {
+            return false;
+        }
+        // if the MenuItem array of our menu is null
+        // or its length is 0
+        // there's no items to search for
+        if (this->size = 0 || this->items == nullptr) {
+            return false;
+        }
+        for (int i = 0; i < this->size; i++) {
+            if (this->items[i].getName() == menuItemName) {
+                return true;
+            }
+        }
+        return false;
+    }
+    void push(MenuItem& m) {
+        // don't push anything if the menu item has an empty name, an empty ingredient list, or a null ingredient list
+        if (m.getName() == "" || m.getIngredients() == nullptr || m.getSize() == 0) return;
+        // don't push anything if the item already exists
+        if (this->isInMenu(m.getName())) return;
+        MenuItem* temp = new MenuItem[size + 1];
+        for (int i = 0; i < size; i++) {
+            temp[i] = items[i];
+        }
+        temp[size] = m;
+        delete[] items;
+        items = temp;
+        size++;
+    }
     friend ostream& operator<<(ostream& out, const Menu& m) {
         if (m.items != nullptr && m.size > 0) {
             out << "Menu:\n";
@@ -147,6 +225,7 @@ public:
         else {
             out << "This menu is empty!\n";
         }
+        return out;
     }
 };
 
@@ -228,13 +307,13 @@ int main() {
     MenuItem m2("Pizza", stuff, 3);
     MenuItem m3("Hawaii", stuff2, 5);
     MenuItem m4;
-    cout << m4;
+    // cout << m4;
     MenuItem m5;
-    m5 = m4;
-    cout << m5;
-    m5 = m3;
-    cout << m5;
-    // Menu menu;
-    // cout << menu;
+    // m5 = m4;
+    // cout << m5;
+    // m5 = m3;
+    // cout << m5;
+    Menu menu;
+    cout << menu;
     return 0;
 }
