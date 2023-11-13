@@ -111,6 +111,12 @@ public:
             throw runtime_error("Stock is already 0!");
         }
     }
+    explicit operator int() {
+        return this->qty;
+    }
+    bool operator!() {
+        return !(this->qty);
+    }
 };
 
 class MenuItem {
@@ -503,6 +509,7 @@ int main()
     Ingredient i5("cheese", 40);
     Ingredient i6("olives", 15);
     Ingredient i7("pineapple", 10);
+    Ingredient i8("nothing", 0);
     Ingredient i3;
     
     Ingredient si1("flour", 1000);
