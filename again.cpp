@@ -73,8 +73,6 @@ public:
         }
         else this->qty = newQty;
     }
-    Ingredient& operator++(){
-    }
     Ingredient operator+(int extraQty) {
 		if (extraQty > 0) {
 			Ingredient res = *this;
@@ -82,6 +80,37 @@ public:
 			return res;
 		}
 	}
+    Ingredient& operator++() {
+        this->qty++;
+        return *this;
+    }
+    
+    Ingredient operator++(int) {
+        Ingredient temp = *this;
+        this->qty++;
+        return temp;
+    }
+
+    Ingredient& operator--() {
+        if (this->qty >= 1) {
+            this->qty--;
+            return *this;
+        }
+        else {
+            throw runtime_error("Stock is already 0!");
+        }
+    }
+
+    Ingredient operator--(int) {
+        if (this->qty >= 1) {
+            Ingredient temp = *this;
+            this->qty--;
+            return temp;
+        }
+        else {
+            throw runtime_error("Stock is already 0!");
+        }
+    }
 };
 
 class MenuItem {
@@ -469,15 +498,13 @@ public:
 int main() 
 {
     Ingredient i1("flour", 100);
-    cout << i1 << "\n";
-    cout << i1 + 10 << "\n";
     Ingredient i2("tomatoes", 50);
     Ingredient i4("ham", 60);
     Ingredient i5("cheese", 40);
     Ingredient i6("olives", 15);
     Ingredient i7("pineapple", 10);
     Ingredient i3;
-
+    
     Ingredient si1("flour", 1000);
     Ingredient si2("tomatoes", 500);
     Ingredient si3("ham", 600);
