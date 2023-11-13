@@ -1,6 +1,16 @@
 #include <iostream>
 using namespace std;
 
+// TODO:
+// TODO:
+// Reimplement Parser as a controller class
+// Think of a solution for parsing multi-word named menu items from user input
+// FIXME:
+// FIXME:
+// Order class doesn't keep track of the number of ordered items - maybe make a new class called OrderItem which holds the MenuItem and its Quanity so that Order can hold an array or OrderItems instead
+    // this would also mean that the push method, copy constructor, copy assignment and destructor need to be changed
+    // when the push method finds an element that already exists in the array, it should increment the quantity of that item instead of skipping it
+
 class Ingredient {
 private:
     char* name = nullptr;
