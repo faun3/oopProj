@@ -117,6 +117,9 @@ public:
     bool operator!() {
         return !(this->qty);
     }
+    bool operator>(const Ingredient& other) {
+        return this->qty > other.qty;
+    }
 };
 
 class MenuItem {
@@ -511,6 +514,9 @@ int main()
     Ingredient i7("pineapple", 10);
     Ingredient i8("nothing", 0);
     Ingredient i3;
+    if (i1 > i2) cout << "ok\n";
+    if (i2 > i1) cout << "bad\n";
+    if (i1 > i3) cout << "ok\n";
     
     Ingredient si1("flour", 1000);
     Ingredient si2("tomatoes", 500);
