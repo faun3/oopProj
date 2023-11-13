@@ -64,6 +64,15 @@ public:
     const char* getName() const {
         return name;
     }
+    int getQty() const {
+        return qty;
+    }
+    void setQty(int newQty) {
+        if (newQty < 0) {
+            throw new runtime_error("Quantity cannot be negative!");
+        }
+        else this->qty = newQty;
+    }
 };
 
 class MenuItem {
@@ -136,14 +145,14 @@ public:
         }
         return out;
     }
-    string getName() {
+    string getName() const{
         return name;
     }
     const Ingredient* getIngredients() {
-        return ingredients;
+        return this->ingredients;
     }
     int getSize() {
-        return size;
+        return this->size;
     }
 };
 
@@ -351,6 +360,12 @@ public:
             this->items = temp;
         }
     }
+    int getSize() {
+        return this->size;
+    }
+    OrderItem* getItems() {
+        return this->items;
+    }
 };
 
 
@@ -408,9 +423,37 @@ public:
         } 
         return ost;
     }
+    // this is horrible
+    void reduceStock (Order& o) {
+        if (this->ingredients == nullptr || this->size == 0) {
+            return;
+        }
+        if (o.getItems() != nullptr && o.getSize() > 0) {
+            // loop through every OrderItem in the Order
+            for (int i = 0; i < o.getSize(); i++) {
+                // loop through every Ingredient in the Stock
+                for (int j = 0; j < this->size; j++) {
+                    // if the name of the OrderItem matches the name of the Ingredient
+                    if (strcmp(o.getItems()[i].item.getIngredients()[j].getName(), this->ingredients[j].getName())) {
+                        // if the quantity of the Ingredient is less than the quantity of the OrderItem
+                        if (this->ingredients[j].getQty() < o.getItems()[i].qty) {
+                            // throw an error
+                            throw new runtime_error("Not enough ingredients in stock!");
+                        }
+                        // otherwise
+                        else {
+                            // reduce the quantity of the Ingredient by the quantity of the OrderItem
+                            this->ingredients[j].setQty(this->ingredients[j].getQty() - o.getItems()[i].qty * o.getItems()[i].item.getIngredients()[j].getQty());
+                        }
+                    }
+                }
+            }
+        }
+    }
 };
 
-int main() {
+int main() 
+{
     Ingredient i1("flour", 100);
     Ingredient i2("tomatoes", 50);
     Ingredient i4("ham", 60);
@@ -418,11 +461,22 @@ int main() {
     Ingredient i6("olives", 15);
     Ingredient i7("pineapple", 10);
     Ingredient i3;
+
+    Ingredient si1("flour", 1000);
+    Ingredient si2("tomatoes", 500);
+    Ingredient si3("ham", 600);
+    Ingredient si4("cheese", 400);
+    Ingredient si5("olives", 150);
+    Ingredient si6("pineapple", 100);
     
     Stock stock;
-    stock.push(i1);
-    stock.push(i2);
-    stock.push(i3);
+    stock.push(si1);
+    stock.push(si2);
+    stock.push(si3);
+    stock.push(si4);
+    stock.push(si5);
+    stock.push(si6);
+    cout << stock;
 
     // including a default constructed object in this array leads to a segfault
     // no idea why -- yes idea why
@@ -458,5 +512,8 @@ int main() {
 
     order.push(m5);
     cout << order;
+
+    // stock.reduceStock(order);
+    cout << stock;
     return 0;
 }
