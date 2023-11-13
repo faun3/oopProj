@@ -191,29 +191,31 @@ public:
         // if the MenuItem array of our menu is null
         // or its length is 0
         // there's no items to search for
-        if (this->size = 0 || this->items == nullptr) {
+        if (this->size <= 0 || this->items == nullptr) {
             return false;
         }
-        for (int i = 0; i < this->size; i++) {
-            if (this->items[i].getName() == menuItemName) {
-                return true;
+        else {
+            for (int i = 0; i < this->size; i++) {
+                if (this->items[i].getName() == menuItemName) {
+                    return true;
+                }
             }
+            return false;
         }
-        return false;
     }
     void push(MenuItem& m) {
         // don't push anything if the menu item has an empty name, an empty ingredient list, or a null ingredient list
 
-        // if (m.getName() == "" || m.getIngredients() == nullptr || m.getSize() == 0) {
-        //     cout << "\nDEBUG ONLY: pushed MenuItem has an empty name, an empty ingredient list, or a null ingredient list\n";
-        //     return;
-        // }
+        if (m.getName() == "" || m.getIngredients() == nullptr || m.getSize() == 0) {
+            cout << "\nDEBUG ONLY: pushed MenuItem has an empty name, an empty ingredient list, or a null ingredient list\n";
+            return;
+        }
         // don't push anything if the item already exists
         
-        // if (this->isInMenu(m.getName())) {
-        //     cout << "\nDEBUG ONLY: pushed MenuItem is already in the menu\n";
-        //     return;
-        // }
+        if (this->isInMenu(m.getName())) {
+            // cout << "\nDEBUG ONLY: pushed MenuItem is already in the menu\n";
+            return;
+        }
         MenuItem* temp = new MenuItem[this->size + 1];
         for (int i = 0; i < this->size; i++) {
             temp[i] = this->items[i];
@@ -325,12 +327,15 @@ int main() {
     // m5 = m3;
     // cout << m5;
     Menu menu;
-    cout << menu;
     menu.push(m3);
     cout << menu;
-    menu.push(m2);
-    cout << menu;
-    menu.push(m4);
+    MenuItem mEmpty;
+    MenuItem mBlank("", stuff2, 6);
+    MenuItem mBlank2("Hello", stuff2, -1);
+    MenuItem mBlank3("NothingPizza", nullptr, 5);
+    menu.push(mBlank);
+    menu.push(mBlank2);
+    menu.push(mBlank3);
     cout << menu;
     return 0;
 }
