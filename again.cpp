@@ -203,17 +203,25 @@ public:
     }
     void push(MenuItem& m) {
         // don't push anything if the menu item has an empty name, an empty ingredient list, or a null ingredient list
-        if (m.getName() == "" || m.getIngredients() == nullptr || m.getSize() == 0) return;
+
+        // if (m.getName() == "" || m.getIngredients() == nullptr || m.getSize() == 0) {
+        //     cout << "\nDEBUG ONLY: pushed MenuItem has an empty name, an empty ingredient list, or a null ingredient list\n";
+        //     return;
+        // }
         // don't push anything if the item already exists
-        if (this->isInMenu(m.getName())) return;
-        MenuItem* temp = new MenuItem[size + 1];
-        for (int i = 0; i < size; i++) {
-            temp[i] = items[i];
+        
+        // if (this->isInMenu(m.getName())) {
+        //     cout << "\nDEBUG ONLY: pushed MenuItem is already in the menu\n";
+        //     return;
+        // }
+        MenuItem* temp = new MenuItem[this->size + 1];
+        for (int i = 0; i < this->size; i++) {
+            temp[i] = this->items[i];
         }
-        temp[size] = m;
-        delete[] items;
-        items = temp;
-        size++;
+        temp[this->size] = m;
+        delete[] this->items;
+        this->items = temp;
+        this->size++;
     }
     friend ostream& operator<<(ostream& out, const Menu& m) {
         if (m.items != nullptr && m.size > 0) {
@@ -225,6 +233,9 @@ public:
         else {
             out << "This menu is empty!\n";
         }
+        // FIXME:
+        // don't forget to return ost when you overload <<
+        // or you'll get a trace trap error :(
         return out;
     }
 };
@@ -314,6 +325,12 @@ int main() {
     // m5 = m3;
     // cout << m5;
     Menu menu;
+    cout << menu;
+    menu.push(m3);
+    cout << menu;
+    menu.push(m2);
+    cout << menu;
+    menu.push(m4);
     cout << menu;
     return 0;
 }
