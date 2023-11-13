@@ -213,6 +213,12 @@ public:
     int getSize() {
         return this->size;
     }
+    Ingredient operator[](int at) {
+        if (at >= 0 && at < this->size) {
+            return this->ingredients[at];
+        }
+        else throw runtime_error("Invalid index!");
+    }
 };
 
 class Menu {
