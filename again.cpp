@@ -129,6 +129,27 @@ public:
     }
 };
 
+class Menu {
+private:
+    MenuItem* items = nullptr;
+    int size = 0;
+public:
+    Menu() {}
+    Menu(const Menu& other) {}
+    ~Menu() {}
+    friend ostream& operator<<(ostream& out, const Menu& m) {
+        if (m.items != nullptr && m.size > 0) {
+            out << "Menu:\n";
+            for (int i = 0; i < m.size; i++) {
+                out << m.items[i];
+            }
+        }
+        else {
+            out << "This menu is empty!\n";
+        }
+    }
+};
+
 class Stock {
 private:
     Ingredient* ingredients = nullptr;
@@ -187,19 +208,15 @@ int main() {
     Ingredient i1("flour", 100);
     Ingredient i2("tomatoes", 50);
     Ingredient i4("ham", 60);
-    // cout << i1 << " " << i2;
-    // cout << "\n";
-    // cout << i2 << "\n";
+    Ingredient i5("cheese", 40);
+    Ingredient i6("olives", 15);
+    Ingredient i7("pineapple", 10);
     Ingredient i3;
-    // cout << i3;
     
-    // Stock stock;
-    // stock.push(i1);
-    // cout << stock;
-    // stock.push(i2);
-    // cout << stock;
-    // stock.push(i3);
-    // cout << stock;
+    Stock stock;
+    stock.push(i1);
+    stock.push(i2);
+    stock.push(i3);
 
     // including a default constructed object in this array leads to a segfault
     // no idea why -- yes idea why
@@ -207,8 +224,17 @@ int main() {
     // (if other.array was nullptr it still allocated memory instead of setting this.array to nullptr)
 
     Ingredient stuff[] = {i1, i2, i3};
+    Ingredient stuff2[] = {i1, i2, i5, i6, i7};
     MenuItem m2("Pizza", stuff, 3);
-    cout << m2;
-    
+    MenuItem m3("Hawaii", stuff2, 5);
+    MenuItem m4;
+    cout << m4;
+    MenuItem m5;
+    m5 = m4;
+    cout << m5;
+    m5 = m3;
+    cout << m5;
+    // Menu menu;
+    // cout << menu;
     return 0;
 }
