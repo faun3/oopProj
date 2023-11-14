@@ -158,13 +158,21 @@ public:
         }
     }
     MenuItem(const MenuItem& other) {
-        if (other.ingredients != nullptr) {
+        if (other.ingredients != nullptr && other.size > 0) {
             size = other.size;
             ingredients = new Ingredient[size];
             for (int i = 0; i < size; i++) {
                 ingredients[i] = other.ingredients[i];
             }
         }
+        else {
+            this->ingredients = nullptr;
+            this->size = 0;
+        }
+        if (other.name != "") {
+            this->name = other.name;
+        }
+        else this->name = "";
     }
     ~MenuItem() {
         if (ingredients != nullptr) {
@@ -294,6 +302,26 @@ public:
             return false;
         }
     }
+    int getByName (string menuItemName) {
+        if (menuItemName == "") return -1;
+        if (this->size <= 0 || this->items == nullptr) {
+            return -1;
+        }
+        else {
+            for (int i = 0; i < this->size; i++){
+                if (this->items[i].getName() == menuItemName) {
+                    return i;
+                }
+            }
+        }
+        return -1;
+    }
+    MenuItem getMenuItemByName(int idx) {
+        if (idx != -1) {
+            return this->items[idx];
+        }
+        else throw new runtime_error("Item is not in menu!");
+    }
     void push(MenuItem& m) {
         // don't push anything if the menu item has an empty name, an empty ingredient list, or a null ingredient list
 
@@ -330,6 +358,9 @@ public:
         // don't forget to return ost when you overload <<
         // or you'll get a trace trap error :(
         return out;
+    }
+    MenuItem* getItems() {
+        return this->items;
     }
 };
 
@@ -633,7 +664,6 @@ public:
             else if (secondWord == "place") {
                 try {
                     Stock copy = this->stockInstance.reduceStock(this->orderInstance);
-                    cout << copy;
                     if (this->orderInstance.getItems() != nullptr) {
                         cout << "\nYour order is being prepared!\n";
                         // dangerous line below
@@ -657,7 +687,8 @@ public:
                 string itemName;
                 string itemQtyAsString;
                 iss >> itemName >> itemQtyAsString;
-                if (!menuInstance.isInMenu(itemName)) {
+                int menuItemPos = menuInstance.getByName(itemName);
+                if (menuItemPos == -1) {
                         cout << "We don't serve that item!\n";
                         return;
                 }
@@ -669,6 +700,10 @@ public:
                     }
                     else {
                         cout << "\nYou added " << itemName << " " << itemQty << " times.\n";
+                        MenuItem toPush = this->menuInstance.getItems()[menuItemPos];
+                        cout << "Instance from get:" << this->menuInstance.getItems()[menuItemPos] << "\n";
+                        cout << "Copied instance:" << toPush << "\n";
+                        this->orderInstance.push(toPush);
                     }
                     
                 }
