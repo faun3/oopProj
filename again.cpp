@@ -632,9 +632,17 @@ public:
             }
             else if (secondWord == "place") {
                 try {
-                    this->stockInstance.reduceStock(this->orderInstance);
-                    cout << "Your order is being prepared!";
-                    this->orderInstance.emptyOrder();
+                    Stock copy = this->stockInstance.reduceStock(this->orderInstance);
+                    cout << copy;
+                    if (this->orderInstance.getItems() != nullptr) {
+                        cout << "\nYour order is being prepared!\n";
+                        // dangerous line below
+                        this->stockInstance = copy;
+                        this->orderInstance.emptyOrder();
+                    }
+                    else {
+                        cout << "\nYour order is empty! Please add at least one item before ordering!\n";
+                    }
                 }
                 catch (runtime_error& e) {
                     cout << e.what();
