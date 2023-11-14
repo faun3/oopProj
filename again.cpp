@@ -411,6 +411,11 @@ public:
             return -1;
         }
     }
+    void emptyOrder() {
+        delete[] this->items;
+        this->size = 0;
+        this->items = nullptr;
+    }
     void push(MenuItem& m) {
         if (m.getName() == "" || m.getIngredients() == nullptr || m.getSize() == 0) {
             return;
@@ -597,7 +602,7 @@ public:
     bool isRunning () {
         return running;
     }
-    void showMenu() {
+    void showCommands() {
         cout << cmdOptions;
     }
     void parseLine() {
@@ -608,10 +613,13 @@ public:
         string firstWord;
         iss >> firstWord;
         if (firstWord == "help") {
-            showMenu();   
+            showCommands();   
+        }
+        else if (firstWord == "menu") {
+            cout << this->menuInstance;
         }
         else if (firstWord == "stock") {
-            // print stocks here
+            cout << this->stockInstance;
         }
         else if (firstWord == "quit") {
             running = false;
@@ -620,10 +628,22 @@ public:
             string secondWord;
             iss >> secondWord;
             if (secondWord == "show") {
-                // print order here
+                cout << this->orderInstance;
             }
             else if (secondWord == "place") {
-                // place the order here
+                try {
+                    this->stockInstance.reduceStock(this->orderInstance);
+                    cout << "Your order is being prepared!";
+                    this->orderInstance.emptyOrder();
+                }
+                catch (runtime_error& e) {
+                    cout << e.what();
+                    this->orderInstance.emptyOrder();
+                }
+            }
+            else if (secondWord == "empty") {
+                cout << "Order was cleared!\n";
+                this->orderInstance.emptyOrder();
             }
             else if (secondWord == "add") {
                 string itemName;
@@ -653,7 +673,7 @@ public:
     }
 };
 
-string Parser::cmdOptions = "\nWelcome!\nYou can look at the menu using \"menu\".\nCheck out our currently available ingredients using \"stock\".\nAdd items to your order with \"order add <item name> <item quanitity>\".\nSee your current order using \"order show\".\nPlace your order using \"order place\".\nShow this screen again by typing the \"help\" command.\nYou can leave the restaurant using the \"quit\" command.\n\n";
+string Parser::cmdOptions = "\nWelcome!\nYou can look at the menu using \"menu\".\nCheck out our currently available ingredients using \"stock\".\nAdd items to your order with \"order add <item name> <item quanitity>\".\nSee your current order using \"order show\".\nRemove all items from your current order using \"order empty\".\nPlace your order using \"order place\".\nShow this screen again by typing the \"help\" command.\nYou can leave the restaurant using the \"quit\" command.\n\n";
 
 int main() 
 {
@@ -743,7 +763,7 @@ int main()
     cout << "\n";
 
     Parser parser(menu, stock, order);
-    parser.showMenu();
+    parser.showCommands();
     while (parser.isRunning()) {
         parser.parseLine();
     }
