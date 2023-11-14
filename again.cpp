@@ -7,6 +7,7 @@ using namespace std;
 // Think of a solution for parsing multi-word named menu items from user input
 // FIXME:
 // FIXME:
+// reduceStocks() doesn't really do anything, it needs to be fixed
 
 
 
@@ -488,6 +489,9 @@ public:
         } 
         return ost;
     }
+    Ingredient* getIngredients() {
+        return this->ingredients;
+    }
     int findByName(const char* name) {
         if (name == nullptr) {
             return -1;
@@ -505,20 +509,36 @@ public:
             }
         }
     }
-    void reduceStock(Order& order) {
+    // untested spaghetti code
+    Stock reduceStock(Order& order) {
+        Stock copy = *this;
         for (int i = 0; i < order.getSize(); i++) {
+            // here we're looping through OrderItems
             for (int j = 0; j < order.getItems()[i].item.getSize(); j++) {
-                int idx = this->findByName(order.getItems()[i].item.getIngredients()[j].getName()) == -1; 
-                if (idx == -1) {
-                    throw new runtime_error("Order cannot be completed! One of the ingredients in your order was never part of our stocks!");
-                }
-                else {
-                    if (idx != -1) {
-                        this->ingredients[idx].setQty(this->ingredients[idx].getQty() - order.getItems()[i].item.getIngredients()[j].getQty() * order.getItems()[i].qty);
+                // here we're looping through ingredients
+
+                // check for a match
+                // if the ingredient is in the order
+                // but it's not in stock -- the order fails
+                // if the ingredient is in the order AND in stock
+                // and the orderQty (Ingredient.qty * OrderItem.qty) is less than Stock.Ingredient.qty
+                // the order goes through
+                // fail fallthrough
+                for (int k = 0; k < this->size; k++) {
+                    if (order.getItems()[i].item.getIngredients()[j].getName() == this->ingredients[k].getName()) {
+                        if (order.getItems()[i].item.getIngredients()[j].getQty() * order.getItems()[i].qty > this->ingredients[k].getQty()) {
+                            string offendingItem = ingredients[k].getName();
+                            string message = "Not enough stock! " + offendingItem + " is not in stock in the desired quanity\n";
+                            throw new runtime_error(message);
+                        }
+                        else {
+                            copy.ingredients[k].setQty(copy.ingredients[k].getQty() - order.getItems()[i].item.getIngredients()[j].getQty() * order.getItems()[i].qty);
+                        }
                     }
                 }
             }
         }
+        return copy;
     }
 };
 
@@ -533,11 +553,6 @@ int main()
     Ingredient i8("nothing", 0);
     Ingredient i9("nothing", 0);
     Ingredient i3;
-    if (i1 == i1) cout << "ok\n";
-    // if (i1 == i2) cout << "bad\n";
-    // if (i1 == i3) cout << "bad\n";
-    if (i3 == i3) cout << "bad\n";
-    if (i8 == i9) cout << "ok\n";
     
     Ingredient si1("flour", 1000);
     Ingredient si2("tomatoes", 500);
@@ -545,6 +560,7 @@ int main()
     Ingredient si4("cheese", 400);
     Ingredient si5("olives", 150);
     Ingredient si6("pineapple", 100);
+    Ingredient si7("beans", 60);
     
     Stock stock;
     stock.push(si1);
@@ -560,7 +576,7 @@ int main()
     // the copy constructor was wrong
     // (if other.array was nullptr it still allocated memory instead of setting this.array to nullptr)
 
-    Ingredient stuff[] = {i1, i2, i3};
+    Ingredient stuff[] = {i1, i2, i4};
     Ingredient stuff2[] = {i1, i2, i5, i6, i7};
     MenuItem m2("Pizza", stuff, 3);
     MenuItem m3("Hawaii", stuff2, 5);
@@ -573,24 +589,40 @@ int main()
     // cout << m5;
     Menu menu;
     menu.push(m3);
+    menu.push(m2);
     cout << menu;
 
     Order order;
-    cout << order;
-
     order.push(m3);
-    cout << order;
-
     order.push(m3);
-    cout << order;
-    
     order.push(m2);
     cout << order;
 
-    order.push(m5);
-    cout << order;
-
-    // stock.reduceStock(order);
+    // removing the ingredients works, copying into stock doesn't 
     cout << stock;
+    
+    cout << "\n";
+    cout << order.getItems()[0].item.getIngredients()[0].getName();
+    cout << "\n";
+
+    cout << stock.getIngredients()[0].getName();
+    cout << "\n";
+
+    cout << order.getItems()[0].item.getIngredients()[0].getQty();
+    cout << "\n";
+
+    cout << order.getItems()[0].qty;
+    cout << "\n";
+    
+    stock.getIngredients()[0].setQty(stock.getIngredients()[0].getQty() - order.getItems()[0].item.getIngredients()[0].getQty() * order.getItems()[0].qty);
+
+    cout << stock.getIngredients()[0].getQty();
+    cout << "\n";
+
+    Stock newStock = stock.reduceStock(order);
+    cout << "\n";
+    cout << newStock;
+    cout << "\n";
+
     return 0;
 }
