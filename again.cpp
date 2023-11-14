@@ -515,6 +515,7 @@ public:
         for (int i = 0; i < order.getSize(); i++) {
             // here we're looping through OrderItems
             for (int j = 0; j < order.getItems()[i].item.getSize(); j++) {
+                cout << "\n" << "Currently checking order item: " << order.getItems()[i].item.getName();
                 // here we're looping through ingredients
 
                 // check for a match
@@ -525,14 +526,23 @@ public:
                 // the order goes through
                 // fail fallthrough
                 for (int k = 0; k < this->size; k++) {
-                    if (order.getItems()[i].item.getIngredients()[j].getName() == this->ingredients[k].getName()) {
-                        if (order.getItems()[i].item.getIngredients()[j].getQty() * order.getItems()[i].qty > this->ingredients[k].getQty()) {
+                    cout << "\n" << "Currently checking order item ingredient: " << order.getItems()[i].item.getIngredients()[j].getName() << " against " << this->ingredients[k].getName();
+                    if (strcmp(order.getItems()[i].item.getIngredients()[j].getName(), this->ingredients[k].getName()) == 0) {
+                        if (order.getItems()[i].item.getIngredients()[j].getQty() * order.getItems()[i].qty <= this->ingredients[k].getQty()) {
+                            cout << "\n";
+                            cout << "Reducing quantity of " << this->ingredients[k].getName();
+                            copy.ingredients[k].setQty(copy.ingredients[k].getQty() - order.getItems()[i].item.getIngredients()[j].getQty() * order.getItems()[i].qty);
+                            cout << "\n" << "Reducing qty by " << order.getItems()[i].item.getIngredients()[j].getQty() * order.getItems()[i].qty;
+                            cout << "\n";
+                            cout << "Quantity was changed to: " << copy.ingredients[k].getQty();
+
+                            
+                        }
+                        else {
+                            cout << "\n" << "Should throw exception";
                             string offendingItem = ingredients[k].getName();
                             string message = "Not enough stock! " + offendingItem + " is not in stock in the desired quanity\n";
                             throw new runtime_error(message);
-                        }
-                        else {
-                            copy.ingredients[k].setQty(copy.ingredients[k].getQty() - order.getItems()[i].item.getIngredients()[j].getQty() * order.getItems()[i].qty);
                         }
                     }
                 }
@@ -601,23 +611,28 @@ int main()
     // removing the ingredients works, copying into stock doesn't 
     cout << stock;
     
-    cout << "\n";
-    cout << order.getItems()[0].item.getIngredients()[0].getName();
-    cout << "\n";
+    // cout << "\n";
+    // cout << order.getItems()[0].item.getIngredients()[0].getName();
+    // cout << "\n";
 
-    cout << stock.getIngredients()[0].getName();
-    cout << "\n";
+    // cout << stock.getIngredients()[0].getName();
+    // cout << "\n";
 
-    cout << order.getItems()[0].item.getIngredients()[0].getQty();
-    cout << "\n";
+    // if (strcmp(order.getItems()[0].item.getIngredients()[0].getName(), stock.getIngredients()[0].getName()) == 0) {
+    //     cout << "\nThey're equal";
+    // }
+                            
 
-    cout << order.getItems()[0].qty;
-    cout << "\n";
+    // cout << order.getItems()[0].item.getIngredients()[0].getQty();
+    // cout << "\n";
+
+    // cout << order.getItems()[0].qty;
+    // cout << "\n";
     
-    stock.getIngredients()[0].setQty(stock.getIngredients()[0].getQty() - order.getItems()[0].item.getIngredients()[0].getQty() * order.getItems()[0].qty);
+    // stock.getIngredients()[0].setQty(stock.getIngredients()[0].getQty() - order.getItems()[0].item.getIngredients()[0].getQty() * order.getItems()[0].qty);
 
-    cout << stock.getIngredients()[0].getQty();
-    cout << "\n";
+    // cout << stock.getIngredients()[0].getQty();
+    // cout << "\n";
 
     Stock newStock = stock.reduceStock(order);
     cout << "\n";
