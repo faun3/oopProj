@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 using namespace std;
 
 // TODO:
@@ -253,19 +254,25 @@ public:
             delete[] items;
         }
     }
+    // FIXME:
+    // this assignment operator was broken
+    // it didn't return anything and it didn't check for self assignment
     Menu& operator=(const Menu& other) {
-        if (other.items != nullptr && other.size > 0) {
-            size = other.size;
-            delete[] items;
-            items = new MenuItem[size];
-            for (int i = 0; i < size; i++) {
-                items[i] = other.items[i];
+        if (this != &other) {
+            if (other.items != nullptr && other.size > 0) {
+                size = other.size;
+                delete[] items;
+                items = new MenuItem[size];
+                for (int i = 0; i < size; i++) {
+                    items[i] = other.items[i];
+                }
+            }
+            else {
+                this->items = nullptr;
+                this->size = 0;
             }
         }
-        else {
-            this->items = nullptr;
-            this->size = 0;
-        }
+        return *this;
     }
     bool isInMenu(string menuItemName) {
         // MenuItems with empty names are not included in any menu
@@ -434,9 +441,6 @@ public:
     }
 };
 
-
-
-
 class Stock {
 private:
     Ingredient* ingredients = nullptr;
@@ -459,6 +463,23 @@ public:
         if (ingredients != nullptr) {
             delete[] ingredients;
         }
+    }
+    Stock& operator=(Stock& other) {
+        if (this != &other) {
+            if (other.ingredients != nullptr && other.size > 0) {
+                delete[] this->ingredients;
+                this->size = other.size;
+                this->ingredients = new Ingredient[this->size];
+                for (int i = 0; i < this->size; i++) {
+                    this->ingredients[i] = other.ingredients[i];
+                }
+            }
+            else {
+                this->ingredients = nullptr;
+                this->size = 0;
+            }
+        }
+        return *this;
     }
     void push(Ingredient& i) {
         // pushing an item with a null name
@@ -552,6 +573,88 @@ public:
     }
 };
 
+class Parser {
+private:
+    static string cmdOptions;
+    bool running = true;
+    // cheap trick to add a dynamically allocated field in this class too
+    // not implemented yet, will be pretty useless even when it's done 
+    // string* commandHistory = nullptr;
+    // int commandHistoryLen = 0;
+    const int MAX_HISTORY = 100;
+    Menu menuInstance;
+    Stock stockInstance;
+    Order orderInstance;
+public:
+    Parser(Menu menu, Stock stock, Order order) {
+        // this->commandHistory = nullptr;
+        // this->commandHistoryLen = 0;
+        this->running = true;
+        this->menuInstance = menu;
+        this->stockInstance = stock;
+        this->orderInstance = order;
+    }
+    bool isRunning () {
+        return running;
+    }
+    void showMenu() {
+        cout << cmdOptions;
+    }
+    void parseLine() {
+        string userInput;
+        getline(cin, userInput);
+        istringstream iss(userInput);
+        // string firstWord = userInput.substr(0, userInput.find(" "));
+        string firstWord;
+        iss >> firstWord;
+        if (firstWord == "help") {
+            showMenu();   
+        }
+        else if (firstWord == "stock") {
+            // print stocks here
+        }
+        else if (firstWord == "quit") {
+            running = false;
+        }
+        else if (firstWord == "order"){
+            string secondWord;
+            iss >> secondWord;
+            if (secondWord == "show") {
+                // print order here
+            }
+            else if (secondWord == "place") {
+                // place the order here
+            }
+            else if (secondWord == "add") {
+                string itemName;
+                string itemQtyAsString;
+                iss >> itemName >> itemQtyAsString;
+                if (!menuInstance.isInMenu(itemName)) {
+                        cout << "We don't serve that item!\n";
+                        return;
+                }
+                int itemQty;
+                try {
+                itemQty = stoi(itemQtyAsString);
+                    if (itemQty <= 0) {
+                        cout << "\nNothing to be added! Try using a positive, integer quantity!\n";
+                    }
+                    else {
+                        cout << "\nYou added " << itemName << " " << itemQty << " times.\n";
+                    }
+                    
+                }
+                catch (invalid_argument) {
+                    cout << "\nNothing to be added! Try using a positive, integer quantity!\n";
+                    itemQty = 0;
+                }
+            }
+        }
+    }
+};
+
+string Parser::cmdOptions = "\nWelcome!\nYou can look at the menu using \"menu\".\nCheck out our currently available ingredients using \"stock\".\nAdd items to your order with \"order add <item name> <item quanitity>\".\nSee your current order using \"order show\".\nPlace your order using \"order place\".\nShow this screen again by typing the \"help\" command.\nYou can leave the restaurant using the \"quit\" command.\n\n";
+
 int main() 
 {
     Ingredient i1("flour", 100);
@@ -638,6 +741,12 @@ int main()
     cout << "\n";
     cout << newStock;
     cout << "\n";
+
+    Parser parser(menu, stock, order);
+    parser.showMenu();
+    while (parser.isRunning()) {
+        parser.parseLine();
+    }
 
     return 0;
 }
