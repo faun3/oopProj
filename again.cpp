@@ -6,9 +6,6 @@ using namespace std;
 // TODO:
 // Reimplement Parser as a controller class
 // Think of a solution for parsing multi-word named menu items from user input
-// FIXME:
-// FIXME:
-// reduceStocks() doesn't really do anything, it needs to be fixed
 
 
 
@@ -256,8 +253,9 @@ public:
             //  1.1 if yes, set this.array to nullptr and this.size to 0
             // 1.2 if no, deep copy the array and size into this
             this->size = other.size;
-            delete[] this->items;
-            this->items = nullptr;
+            // FIXME: copy constructors do not need to free any dynamically allocated memory
+            // FIXME: check all copy constructors and remove any calls to delete[]
+            // FIXME: we don't really need to delete[] anything because we are just now creating the object by copy
             this->items = new MenuItem[size];
             for (int i = 0; i < size; i++) {
                 this->items[i] = other.items[i];
