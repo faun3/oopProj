@@ -134,6 +134,17 @@ public:
     bool operator>(const Ingredient& other) {
         return this->qty > other.qty;
     }
+    friend istream& operator>> (istream& is, Ingredient& i) {
+        cout << "\nIntroduceti cantitatea: ";
+        // 
+        // this is untested, don't push it 
+        // TODO: add istream overloads to every single class
+        // TODO: make all istream overloads revert back to default values if user input is invalid
+        // example: is >> i.qty; if (i.qty < 0) { i.qty = 0; }
+        // 
+        // is >> i.qty;
+        // return is;
+    }
 };
 
 class MenuItem {
