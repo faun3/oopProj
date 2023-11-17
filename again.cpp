@@ -732,7 +732,13 @@ public:
             else if (secondWord == "add") {
                 string itemName;
                 string itemQtyAsString;
-                iss >> itemName >> itemQtyAsString;
+                // iss >> itemName >> itemQtyAsString;
+                cout << "\nWhat is the name of the item you want to order? ";
+                getline(cin, itemName);
+                cout << "\nHow many would you like? ";
+                // consume newline
+                getline(cin, itemQtyAsString);
+                iss >> itemQtyAsString;
                 int menuItemPos = menuInstance.getByName(itemName);
                 if (menuItemPos == -1) {
                         cout << "We don't serve that item!\n";
