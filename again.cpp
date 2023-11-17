@@ -255,11 +255,42 @@ public:
         }
         return out;
     }
-    friend istream& operator>>(istream& in, const MenuItem& m) {
+    friend istream& operator>>(istream& in, MenuItem& m) {
         string buffer;
         cout << "\nMenu item name: ";
         in >> buffer;
-        // m.name = "abcd";
+        if (buffer != "" && buffer.size() > 0) {
+            m.name = buffer;
+        }
+        else {
+            cout << "\nMenu item name cannot be empty! Menu item name reset to an empty string.";
+            m.name = "";
+        }
+        cout << "\nNr of ingredients: ";
+        in >> buffer;
+        try {
+            int ingArrLen = stoi(buffer);
+            if (ingArrLen > 0) {
+                m.size = ingArrLen;
+                delete[] m.ingredients;
+                m.ingredients = new Ingredient[m.size];
+                cout << "\nIngredients: ";
+                for (int i = 0; i < m.size; i++) {
+                    Ingredient temp;
+                    in >> temp;
+                    m.ingredients[i] = temp;
+                }
+            }
+            else {
+                cout << "\nMenu items should have a positive integer nr of ingredients! Nr of ingredients was reset to 0";
+                m.size = 0;
+                delete[] m.ingredients;
+                m.ingredients = nullptr;
+            }
+        }
+        catch (invalid_argument) {
+            cout << "\nMenu items should have a positive integer nr of ingredients! Nr of ingredients was reset to 0";
+        }
         return in;
     }
     string getName() {
@@ -638,9 +669,11 @@ public:
                 // and the orderQty (Ingredient.qty * OrderItem.qty) is less than Stock.Ingredient.qty
                 // the order goes through
                 // fail fallthrough
+                bool found = false;
                 for (int k = 0; k < this->size; k++) {
                     cout << "\n" << "Currently checking order item ingredient: " << order.getItems()[i].item.getIngredients()[j].getName() << " against " << this->ingredients[k].getName();
                     if (strcmp(order.getItems()[i].item.getIngredients()[j].getName(), this->ingredients[k].getName()) == 0) {
+                        found = true;
                         if (order.getItems()[i].item.getIngredients()[j].getQty() * order.getItems()[i].qty <= this->ingredients[k].getQty()) {
                             cout << "\n";
                             cout << "Reducing quantity of " << this->ingredients[k].getName();
@@ -658,6 +691,10 @@ public:
                             throw new runtime_error(message);
                         }
                     }
+                }
+                if (!found) {
+                    string message = "\nWe don't have that ingredient in stock!\n";
+                    throw new runtime_error(message);
                 }
             }
         }
@@ -817,6 +854,12 @@ int main()
     order.push(m3, 1);
     order.push(m3, 1);
     order.push(m2, 1);
+
+    MenuItem test;
+    cin >> test;
+    cout << test;
+
+    menu.push(test);
 
     Parser parser(menu, stock, order);
     parser.showCommands();
