@@ -644,17 +644,31 @@ private:
     int size = 0;
 public:   
     Stock() {}
-    Stock(const Stock& other) {
-        if (other.size > 0) {
-            size = other.size;
-        }
-        if (other.ingredients != nullptr) {
-            ingredients = new Ingredient[size];
+    Stock(Ingredient* ingredients, int size) {
+        if (ingredients != nullptr && size > 0) {
+            this->size = size;
+            this->ingredients = new Ingredient[size];
             for (int i = 0; i < size; i++) {
-                ingredients[i] = other.ingredients[i];
+                this->ingredients[i] = ingredients[i];
             }
         }
-        else ingredients = nullptr;
+        else {
+            this->ingredients = nullptr;
+            this->size = 0;
+        }
+    }
+    Stock(const Stock& other) {
+        if (other.ingredients != nullptr && other.size > 0) {
+            this->size = other.size;
+            this->ingredients = new Ingredient[other.size];
+            for (int i = 0; i < other.size; i++) {
+                this->ingredients[i] = other.ingredients[i];
+            }
+        }
+        else {
+            this->ingredients = nullptr;
+            this->size = 0;
+        }
     }
     ~Stock() {
         if (ingredients != nullptr) {
@@ -663,11 +677,13 @@ public:
     }
     Stock& operator=(Stock& other) {
         if (this != &other) {
+            if (ingredients != nullptr) {
+                delete[] ingredients;
+            }
             if (other.ingredients != nullptr && other.size > 0) {
-                delete[] this->ingredients;
                 this->size = other.size;
-                this->ingredients = new Ingredient[this->size];
-                for (int i = 0; i < this->size; i++) {
+                this->ingredients = new Ingredient[other.size];
+                for (int i = 0; i < other.size; i++) {
                     this->ingredients[i] = other.ingredients[i];
                 }
             }
@@ -706,6 +722,30 @@ public:
             }
         } 
         return ost;
+    }
+    friend istream& operator>>(istream& in, Stock& s) {
+        string buffer;
+        cout << "\nNr of ingredients in stock: ";
+        in >> buffer;
+        try {
+            int stockSize = stoi(buffer);
+            if (stockSize < 0) {
+                throw new runtime_error("Nr of ingredients in stock should be a positive integer!");
+            }
+            s.size = stockSize;
+            delete[] s.ingredients;
+            s.ingredients = new Ingredient[stockSize];
+            for (int i = 0; i < s.size; i++) {
+                Ingredient temp;
+                cout << "\nIngredient: ";
+                in >> temp;
+                s.ingredients[i] = temp;
+            }
+        }
+        catch (invalid_argument) {
+            throw runtime_error("Nr of ingredients in stock should be a positive integer!");
+        }
+        return in;
     }
     Ingredient* getIngredients() {
         return this->ingredients;
