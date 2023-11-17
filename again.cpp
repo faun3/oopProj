@@ -859,6 +859,37 @@ public:
     Ingredient* getIngredients() {
         return this->ingredients;
     }
+    void setIngredients(int newSize, Ingredient* newIngredients) {
+        if (newSize <= 0) {
+            throw new runtime_error("Size must be a positive integer!");
+        }
+        if (newIngredients == nullptr) {
+            throw new runtime_error("Ingredient array cannot be null!");
+        }
+        delete[] this->ingredients;
+        this->ingredients = new Ingredient[newSize];
+        for (int i = 0; i < newSize; i++) {
+            this->ingredients[i] = newIngredients[i];
+        }
+        this->size = newSize;
+    }
+    int getSize() {
+        return this->size;
+    }
+    void setSize(int newSize) {
+        if (newSize <= 0 || newSize > this->size) {
+            throw new runtime_error("Size must be a positive integer that is not larger than the current size!");
+        }
+        if (this->ingredients != nullptr) {
+            Ingredient* temp = new Ingredient[newSize];
+            for (int i = 0; i < newSize; i++) {
+                temp[i] = this->ingredients[i];
+            }
+            delete[] this->ingredients;
+            this->ingredients = temp;
+            this->size = newSize;
+        }
+    }
     int findByName(const char* name) {
         if (name == nullptr) {
             return -1;
