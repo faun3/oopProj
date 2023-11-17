@@ -81,6 +81,16 @@ public:
         }
         else this->qty = newQty;
     }
+    void setName(char* newName) {
+        if (newName == nullptr || strlen(newName) == 0) {
+            throw new runtime_error("Name cannot be empty!");
+        }
+        else {
+            delete[] this->name;
+            this->name = new char[strlen(newName) + 1];
+            strcpy(this->name, newName);
+        }
+    }
     Ingredient operator+(int extraQty) {
 		if (extraQty > 0) {
 			Ingredient res = *this;
@@ -973,6 +983,28 @@ int main()
     parser.showCommands();
     while (parser.isRunning()) {
         parser.parseLine();
+    }
+
+    Ingredient test("test", 100);
+    cout << test.getName();
+    cout << test.getQty();
+
+    test.setName("test2");
+    test.setQty(200);
+
+    try {
+
+    test.setName(nullptr);
+    }
+    catch (runtime_error* r) {
+        cout << "\nCaught exception on name\n";
+    }
+    try {
+
+    test.setQty(-1);
+    }
+    catch (runtime_error* r) {
+        cout << "\nCaught exception on qty\n";
     }
 
     return 0;
