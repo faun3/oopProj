@@ -3,13 +3,6 @@
 #include <string>
 using namespace std;
 
-// TODO:
-// TODO:
-// Reimplement Parser as a controller class
-// Think of a solution for parsing multi-word named menu items from user input
-
-
-
 class Ingredient {
 private:
     char* name = nullptr;
@@ -136,12 +129,6 @@ public:
         return this->qty > other.qty;
     }
     friend istream& operator>> (istream& is, Ingredient& i) {
-        
-        // this is untested, don't push it 
-        // TODO: add istream overloads to every single class
-        // TODO: make all istream overloads revert back to default values if user input is invalid
-        // example: is >> i.qty; if (i.qty < 0) { i.qty = 0; }
-        
         cout << "\nIngredient quantity: ";
         string uhOh;
         is >> uhOh;
@@ -491,18 +478,30 @@ private:
     int size = 0;
 public:
     Order() {}
-    Order(const Order& other) {
-        if (other.items != nullptr && other.size > 0) {
-            size = other.size;
-            delete[] items;
-            items = new OrderItem[size];
+    Order (int size, OrderItem* items) {
+        if (size > 0 && items != nullptr) {
+            this->size = size;
+            this->items = new OrderItem[size];
             for (int i = 0; i < size; i++) {
-                items[i] = other.items[i];
+                this->items[i] = items[i];
             }
         }
         else {
-            items = nullptr;
-            size = 0;
+            this->items = nullptr;
+            this->size = 0;
+        }
+    }
+    Order(const Order& other) {
+        if (other.size > 0 && other.items != nullptr) {
+            this->size = other.size;
+            this->items = new OrderItem[other.size];
+            for (int i = 0; i < other.size; i++) {
+                this->items[i] = other.items[i];
+            }
+        }
+        else {
+            this->items = nullptr;
+            this->size = 0;
         }
     }
     ~Order () {
@@ -512,12 +511,14 @@ public:
     }
     Order& operator=(const Order& other) {
         if (this != &other) {
-            if (other.items != nullptr && other.size > 0) {
-                size = other.size;
-                delete[] items;
-                items = new OrderItem[size];
-                for (int i = 0; i < size; i++) {
-                    items[i] = other.items[i];
+            if (this->items != nullptr) {
+                delete[] this->items;
+            }
+            if (other.size > 0 && other.items != nullptr) {
+                this->size = other.size;
+                this->items = new OrderItem[other.size];
+                for (int i = 0; i < other.size; i++) {
+                    this->items[i] = other.items[i];
                 }
             }
             else {
@@ -538,6 +539,44 @@ public:
             out << "This order is empty!\n";
         }
         return out;
+    }
+    friend istream& operator>> (istream& in, Order& o) {
+        string buffer;
+        cout << "\nNr of order items: ";
+        in >> buffer;
+        try {
+            int orderSize = stoi(buffer);
+            if (orderSize < 0) {
+                throw new runtime_error("Nr of order items should be a positive integer!");
+            }
+            o.size = orderSize;
+            delete[] o.items;
+            o.items = new OrderItem[o.size];
+            for (int i = 0; i < o.size; i++) {
+                OrderItem temp;
+                cout << "\nOrder item quantity: ";
+                in >> buffer;
+                try {
+                    int orderItemQty = stoi(buffer);
+                    if (orderItemQty < 0) {
+                        throw new runtime_error("Order item quantity should be a positive integer!");
+                    }
+                    o.items[i].qty = orderItemQty;
+                    cout << "\nOrder item: ";
+                    in >> temp.item;
+                    o.items[i].item = temp.item;
+                }
+                catch (invalid_argument) {
+                    throw new runtime_error("Order item quantity should be a positive integer!");
+                }
+                o.items[i] = temp;
+
+            }
+        }
+        catch (invalid_argument) {
+            throw new runtime_error("Nr of order items should be a positive integer!");
+        }
+        return in;
     }
     // -1 for not found
     // index of item in array otherwise
@@ -850,7 +889,7 @@ public:
     }
 };
 
-string Parser::cmdOptions = "\nWelcome!\nYou can look at the menu using \"menu\".\nCheck out our currently available ingredients using \"stock\".\nAdd items to your order with \"order add <item name> <item quanitity>\".\nSee your current order using \"order show\".\nRemove all items from your current order using \"order empty\".\nPlace your order using \"order place\".\nShow this screen again by typing the \"help\" command.\nYou can leave the restaurant using the \"quit\" command.\n\n";
+string Parser::cmdOptions = "\nWelcome!\nYou can look at the menu using \"menu\".\nCheck out our currently available ingredients using \"stock\".\nAdd items to your order with \"order add\".\nSee your current order using \"order show\".\nRemove all items from your current order using \"order empty\".\nPlace your order using \"order place\".\nShow this screen again by typing the \"help\" command.\nYou can leave the restaurant using the \"quit\" command.\n\n";
 
 int main() 
 {
