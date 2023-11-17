@@ -220,19 +220,24 @@ public:
     }
     MenuItem& operator=(MenuItem& other) {
         if (this != &other) {
+            if (this->ingredients != nullptr) {
+                delete[] this->ingredients;
+            }
             if (other.name != "") {
                 this->name = other.name;
             }
             else this->name = "";
-            delete[] ingredients;
-            size = other.size;
-            if (other.ingredients != nullptr) {
-                ingredients = new Ingredient[size];
-                for (int i = 0; i < size; i++) {
-                    ingredients[i] = other.ingredients[i];
+            if (other.ingredients != nullptr && other.size > 0) {
+                this->ingredients = new Ingredient[other.size];
+                for (int i = 0; i < other.size; i++) {
+                    this->ingredients[i] = other.ingredients[i];
                 }
+                this->size = other.size;
             }
-            else ingredients = nullptr;
+            else {
+                this->ingredients = nullptr;
+                this->size = 0;
+            }
         }
         return *this;
     }
@@ -808,6 +813,11 @@ int main()
     MenuItem m4;
     // cout << m4;
     MenuItem m5;
+    cout << m2 << m3;
+    m2 = m3;
+    cout << m2;
+    m3 = m4;
+    cout << m3;
     // m5 = m4;
     // cout << m5;
     // m5 = m3;
