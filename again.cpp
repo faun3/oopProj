@@ -135,15 +135,40 @@ public:
         return this->qty > other.qty;
     }
     friend istream& operator>> (istream& is, Ingredient& i) {
-        cout << "\nIntroduceti cantitatea: ";
-        // 
+        
         // this is untested, don't push it 
         // TODO: add istream overloads to every single class
         // TODO: make all istream overloads revert back to default values if user input is invalid
         // example: is >> i.qty; if (i.qty < 0) { i.qty = 0; }
-        // 
-        // is >> i.qty;
-        // return is;
+        
+        cout << "\nIngredient quantity: ";
+        string uhOh;
+        is >> uhOh;
+        try {
+            int parsedValue = stoi(uhOh);
+            if (parsedValue > 0) {
+                i.qty = parsedValue;
+            }
+            else i.qty = 0;
+        }
+        catch (invalid_argument) {
+            cout << "\nQuantity should be a positive integer! The provided value was replaced with 0.\n";
+            i.qty = 0;
+        }
+        
+        cout << "\nIngredient name: ";
+        // consume the newline character in the buffer so we can read our ingredient name
+        getline(is, uhOh);
+        getline(is, uhOh);
+        if (uhOh.size() > 0) {
+            i.name = new char[uhOh.size() + 1];
+            strcpy(i.name, uhOh.data());
+        }
+        else {
+            cout << "\nIngredient name cannot be empty! The provided name was replaced with an empty string.\n";
+        }
+
+        return is;
     }
 };
 
@@ -764,7 +789,7 @@ int main()
     stock.push(si4);
     stock.push(si5);
     stock.push(si6);
-    cout << stock;
+    // cout << stock;
 
     // including a default constructed object in this array leads to a segfault
     // no idea why -- yes idea why
@@ -785,16 +810,16 @@ int main()
     Menu menu;
     menu.push(m3);
     menu.push(m2);
-    cout << menu;
+    // cout << menu;
 
     Order order;
     order.push(m3, 1);
     order.push(m3, 1);
     order.push(m2, 1);
-    cout << order;
+    // cout << order;
 
     // removing the ingredients works, copying into stock doesn't 
-    cout << stock;
+    // cout << stock;
     
     // cout << "\n";
     // cout << order.getItems()[0].item.getIngredients()[0].getName();
@@ -819,16 +844,20 @@ int main()
     // cout << stock.getIngredients()[0].getQty();
     // cout << "\n";
 
-    Stock newStock = stock.reduceStock(order);
-    cout << "\n";
-    cout << newStock;
-    cout << "\n";
+    // Stock newStock = stock.reduceStock(order);
+    // cout << "\n";
+    // cout << newStock;
+    // cout << "\n";
 
     Parser parser(menu, stock, order);
     parser.showCommands();
     while (parser.isRunning()) {
         parser.parseLine();
     }
+
+    Ingredient finTest;
+    cin >> finTest;
+    cout << finTest;
 
     return 0;
 }
