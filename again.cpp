@@ -299,6 +299,42 @@ public:
     int getSize() {
         return this->size;
     }
+    void setName(string newName) {
+        if (newName == "" || newName.size() == 0) {
+            throw new runtime_error("Name cannot be empty!");
+        }
+        this->name = newName;
+    }
+    void setSize(int newSize) {
+        if (newSize <= 0 || newSize > this->size) {
+            throw new runtime_error("Size must be a positive integer that is not larger than the current size!");
+        }
+        if (this->ingredients != nullptr) {
+            Ingredient* temp = new Ingredient[newSize];
+            for (int i = 0; i < newSize; i++) {
+                temp[i] = this->ingredients[i];
+            }
+            delete[] this->ingredients;
+            this->ingredients = temp;
+            this->size = newSize;
+        }
+    }
+    void setIngredients(int newSize, Ingredient* newIngredients) {
+        if (newSize <= 0) {
+            throw new runtime_error("Size must be a positive integer!");
+        }
+        if (newIngredients == nullptr) {
+            throw new runtime_error("Ingredient array cannot be null!");
+        }
+        if (this->ingredients != nullptr) {
+            delete[] this->ingredients;
+        }
+        this->ingredients = new Ingredient[newSize];
+        for (int i = 0; i < newSize; i++) {
+            this->ingredients[i] = newIngredients[i];
+        }
+        this->size = newSize;
+    }
     Ingredient operator[](int at) {
         if (at >= 0 && at < this->size) {
             return this->ingredients[at];
@@ -985,27 +1021,8 @@ int main()
         parser.parseLine();
     }
 
-    Ingredient test("test", 100);
-    cout << test.getName();
-    cout << test.getQty();
-
-    test.setName("test2");
-    test.setQty(200);
-
-    try {
-
-    test.setName(nullptr);
-    }
-    catch (runtime_error* r) {
-        cout << "\nCaught exception on name\n";
-    }
-    try {
-
-    test.setQty(-1);
-    }
-    catch (runtime_error* r) {
-        cout << "\nCaught exception on qty\n";
-    }
+    m2.setIngredients(5, stuff2);
+    cout << m2;
 
     return 0;
 }
