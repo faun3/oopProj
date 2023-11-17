@@ -316,21 +316,26 @@ private:
     int size = 0;
 public:
     Menu() {}
-    Menu(const Menu& other) {
-        if (other.items != nullptr && other.size > 0) {
-            // TODO:
-            // all copy constructor steps should be the following
-            // 1. check if other.array is nullptr
-            //  1.1 if yes, set this.array to nullptr and this.size to 0
-            // 1.2 if no, deep copy the array and size into this
-            this->size = other.size;
-            // FIXME: copy constructors do not need to free any dynamically allocated memory
-            // FIXME: check all copy constructors and remove any calls to delete[]
-            // FIXME: we don't really need to delete[] anything because we are just now creating the object by copy
+    Menu(MenuItem* items, int size) {
+        if (items != nullptr && size > 0) {
+            this->size = size;
             this->items = new MenuItem[size];
             for (int i = 0; i < size; i++) {
-                this->items[i] = other.items[i];
+                this->items[i] = items[i];
             }
+        }
+        else {
+            this->items = nullptr;
+            this->size = 0;
+        }
+    }
+    Menu(const Menu& other) {
+        if (other.items != nullptr && other.size > 0) {
+        this->size = other.size;
+        this->items = new MenuItem[other.size];
+        for (int i = 0; i < other.size; i++) {
+            this->items[i] = other.items[i];
+        }
         }
         else {
             this->items = nullptr;
@@ -347,13 +352,15 @@ public:
     // it didn't return anything and it didn't check for self assignment
     Menu& operator=(const Menu& other) {
         if (this != &other) {
-            if (other.items != nullptr && other.size > 0) {
-                size = other.size;
+            if (this->items != nullptr) {
                 delete[] items;
-                items = new MenuItem[size];
-                for (int i = 0; i < size; i++) {
-                    items[i] = other.items[i];
-                }
+            }
+            if (other.items != nullptr && other.size > 0) {
+                this->size = other.size;
+                this->items = new MenuItem[other.size];
+                for (int i = 0; i < other.size; i++) {
+                this->items[i] = other.items[i];
+            }
             }
             else {
                 this->items = nullptr;
@@ -854,12 +861,6 @@ int main()
     order.push(m3, 1);
     order.push(m3, 1);
     order.push(m2, 1);
-
-    MenuItem test;
-    cin >> test;
-    cout << test;
-
-    menu.push(test);
 
     Parser parser(menu, stock, order);
     parser.showCommands();
