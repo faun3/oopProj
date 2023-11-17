@@ -305,6 +305,7 @@ public:
         }
         this->name = newName;
     }
+    // TODO: setSize
     void setSize(int newSize) {
         if (newSize <= 0 || newSize > this->size) {
             throw new runtime_error("Size must be a positive integer that is not larger than the current size!");
@@ -319,6 +320,7 @@ public:
             this->size = newSize;
         }
     }
+    // TODO: setIngredients
     void setIngredients(int newSize, Ingredient* newIngredients) {
         if (newSize <= 0) {
             throw new runtime_error("Size must be a positive integer!");
@@ -509,6 +511,39 @@ public:
     }
     MenuItem* getItems() {
         return this->items;
+    }
+    void setItems(int newSize, MenuItem* newItems) {
+        if (newSize <= 0) {
+            throw new runtime_error("Size must be a positive integer!");
+        }
+        if (newItems == nullptr) {
+            throw new runtime_error("Ingredient array cannot be null!");
+        }
+        if (this->items != nullptr) {
+            delete[] this->items;
+        }
+        this->items = new MenuItem[newSize];
+        for (int i = 0; i < newSize; i++) {
+            this->items[i] = newItems[i];
+        }
+        this->size = newSize;
+    }
+    int getSize() {
+        return this->size;
+    }
+    void setSize(int newSize) {
+        if (newSize <= 0 || newSize > this->size) {
+            throw new runtime_error("Size must be a positive integer that is not larger than the current size!");
+        }
+        if (this->items != nullptr) {
+            MenuItem* temp = new MenuItem[newSize];
+            for (int i = 0; i < newSize; i++) {
+                temp[i] = this->items[i];
+            }
+            delete[] this->items;
+            this->items = temp;
+            this->size = newSize;
+        }
     }
 };
 
