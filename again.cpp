@@ -960,18 +960,13 @@ class Parser {
 private:
     static string cmdOptions;
     bool running = true;
-    // cheap trick to add a dynamically allocated field in this class too
-    // not implemented yet, will be pretty useless even when it's done 
-    // string* commandHistory = nullptr;
-    // int commandHistoryLen = 0;
-    const int MAX_HISTORY = 100;
+    const int MAX_COMMANDS = 20;
+    int commandCount = 0;
     Menu menuInstance;
     Stock stockInstance;
     Order orderInstance;
 public:
     Parser(Menu menu, Stock stock, Order order) {
-        // this->commandHistory = nullptr;
-        // this->commandHistoryLen = 0;
         this->running = true;
         this->menuInstance = menu;
         this->stockInstance = stock;
@@ -984,6 +979,12 @@ public:
         cout << cmdOptions;
     }
     void parseLine() {
+        if (commandCount >= MAX_COMMANDS) {
+            cout << "\nYou've reached the maximum number of commands! Please leave the restaurant!\n";
+            running = false;
+            return;
+        }
+        commandCount++;
         string userInput;
         getline(cin, userInput);
         istringstream iss(userInput);
@@ -1114,9 +1115,6 @@ int main()
     while (parser.isRunning()) {
         parser.parseLine();
     }
-
-    m2.setIngredients(5, stuff2);
-    cout << m2;
 
     return 0;
 }
