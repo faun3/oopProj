@@ -16,8 +16,9 @@ private:
 public:
     Ingredient() {
     }
+    // this was changed
     Ingredient(const char* name, int qty) {
-        if (name != nullptr) {
+        if (name != nullptr && strlen(name) > 0) {
             this->name = new char[strlen(name) + 1];
             strcpy(this->name, name);
         }
@@ -25,30 +26,32 @@ public:
             this->qty = qty;
         }
     }
+    // this was also changed to reflect the change
+    // in the constructor above
     Ingredient (const Ingredient& other) {
         if (other.name != nullptr && strlen(other.name) > 0) {
-            name = new char[strlen(other.name) + 1];
-            strcpy(name, other.name);
-            qty = other.qty;
+            this->name = new char[strlen(other.name) + 1];
+            strcpy(this->name, other.name);
         }
-        else {
-            name = nullptr;
-            qty = 0;
+        if (other.qty > 0) {
+            this->qty = other.qty;
         }
     }
     ~Ingredient() {
         delete[] name;
     }
+    // this was also changed to reflect the changes in the copy constructor
     Ingredient& operator=(const Ingredient& other) {
         if (this != &other) {
             delete[] name;
             if (other.name != nullptr && strlen(other.name) > 0) {
-                name = new char[strlen(other.name) + 1];
-                strcpy(name, other.name);
+                this->name = new char[strlen(other.name) + 1];
+                strcpy(this->name, other.name);
             }
-            else name = nullptr;
+            if (other.qty > 0) {
+                this->qty = other.qty;
+            }
         }
-        qty = other.qty;
         return *this;
     }
     friend ostream& operator<< (ostream& out, const Ingredient& i) {
@@ -456,13 +459,13 @@ public:
         this->size = 0;
         this->items = nullptr;
     }
-    void push(MenuItem& m) {
+    void push(MenuItem& m, int qty) {
         if (m.getName() == "" || m.getIngredients() == nullptr || m.getSize() == 0) {
             return;
         }
         int isInOrders = this->isInOrders(m.getName());
         if (isInOrders != -1) {
-            this->items[isInOrders].qty++;
+            this->items[isInOrders].qty += qty;
         }
         else {
             OrderItem* temp = new OrderItem[this->size + 1];
@@ -471,7 +474,7 @@ public:
             }
             OrderItem tempItem;
             tempItem.item = m;
-            tempItem.qty = 1;
+            tempItem.qty = qty;
             temp[this->size] = tempItem;
             this->size++;
             delete[] this->items;
@@ -683,8 +686,8 @@ public:
                         cout << "\nYour order is empty! Please add at least one item before ordering!\n";
                     }
                 }
-                catch (runtime_error& e) {
-                    cout << e.what();
+                catch (runtime_error* e) {
+                    cout << e->what();
                     this->orderInstance.emptyOrder();
                 }
             }
@@ -710,9 +713,7 @@ public:
                     else {
                         cout << "\nYou added " << itemName << " " << itemQty << " times.\n";
                         MenuItem toPush = this->menuInstance.getItems()[menuItemPos];
-                        cout << "Instance from get:" << this->menuInstance.getItems()[menuItemPos] << "\n";
-                        cout << "Copied instance:" << toPush << "\n";
-                        this->orderInstance.push(toPush);
+                        this->orderInstance.push(toPush, itemQty);
                     }
                     
                 }
@@ -778,9 +779,9 @@ int main()
     cout << menu;
 
     Order order;
-    order.push(m3);
-    order.push(m3);
-    order.push(m2);
+    order.push(m3, 1);
+    order.push(m3, 1);
+    order.push(m2, 1);
     cout << order;
 
     // removing the ingredients works, copying into stock doesn't 
