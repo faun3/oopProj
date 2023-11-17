@@ -331,11 +331,11 @@ public:
     }
     Menu(const Menu& other) {
         if (other.items != nullptr && other.size > 0) {
-        this->size = other.size;
-        this->items = new MenuItem[other.size];
-        for (int i = 0; i < other.size; i++) {
-            this->items[i] = other.items[i];
-        }
+            this->size = other.size;
+            this->items = new MenuItem[other.size];
+            for (int i = 0; i < other.size; i++) {
+                this->items[i] = other.items[i];
+            }
         }
         else {
             this->items = nullptr;
@@ -347,9 +347,6 @@ public:
             delete[] items;
         }
     }
-    // FIXME:
-    // this assignment operator was broken
-    // it didn't return anything and it didn't check for self assignment
     Menu& operator=(const Menu& other) {
         if (this != &other) {
             if (this->items != nullptr) {
@@ -445,6 +442,37 @@ public:
         // don't forget to return ost when you overload <<
         // or you'll get a trace trap error :(
         return out;
+    }
+    friend istream& operator>>(istream& in, Menu& m) {
+        string buffer;
+        cout << "\nNr of menu items: ";
+        in >> buffer;
+        try {
+            int newSize = stoi(buffer);
+            if (newSize > 0) {
+                m.size = newSize;
+                delete[] m.items;
+                m.items = new MenuItem[m.size];
+                for (int i = 0; i < m.size; i++) {
+                    MenuItem temp;
+                    in >> temp;
+                    m.items[i] = temp;
+                }
+            }
+            else {
+                cout << "\nNr of menu items should be a positive integer! Nr of menu items was reset to 0";
+                m.size = 0;
+                delete[] m.items;
+                m.items = nullptr;
+            }
+        }
+        catch (invalid_argument) {
+            cout << "\nNr of menu items should be a positive integer! Nr of menu items was reset to 0";
+            m.size = 0;
+            delete[] m.items;
+            m.items = nullptr;
+        }
+        return in;
     }
     MenuItem* getItems() {
         return this->items;
