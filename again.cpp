@@ -1,5 +1,5 @@
 #include <iostream>
-#include <sstream>
+#include <sstream> // for istringstream -- might not be needed
 using namespace std;
 
 // TODO:
@@ -180,7 +180,10 @@ private:
 public:
     MenuItem () {}
     MenuItem(string name, Ingredient* ingredients, int size) {
-        this->name = name;
+        if (name != "") {
+            this->name = name;
+        }
+        else this->name = "";
         if (ingredients != nullptr && size > 0) {
             this->ingredients = new Ingredient[size];
             for (int i = 0; i < size; i++) {
@@ -194,31 +197,27 @@ public:
         }
     }
     MenuItem(const MenuItem& other) {
+        if (other.name != "") {
+            this->name = other.name;
+        }
+        else this->name = "";
         if (other.ingredients != nullptr && other.size > 0) {
-            size = other.size;
-            ingredients = new Ingredient[size];
-            for (int i = 0; i < size; i++) {
-                ingredients[i] = other.ingredients[i];
+            this->ingredients = new Ingredient[other.size];
+            for (int i = 0; i < other.size; i++) {
+                this->ingredients[i] = other.ingredients[i];
             }
+            this->size = other.size;
         }
         else {
             this->ingredients = nullptr;
             this->size = 0;
         }
-        if (other.name != "") {
-            this->name = other.name;
-        }
-        else this->name = "";
     }
     ~MenuItem() {
-        if (ingredients != nullptr) {
-            delete[] ingredients;
+        if (this->ingredients != nullptr) {
+            delete[] this->ingredients;
         }
     }
-    // TODO:
-    // all copy assignment operators should check if other.array is nullptr
-    // if it's not, deep copy the array
-    // if it is, set this.array to nullptr to avoid double frees
     MenuItem& operator=(MenuItem& other) {
         if (this != &other) {
             if (other.name != "") {
