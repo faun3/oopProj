@@ -465,6 +465,10 @@ public:
         }
         int isInOrders = this->isInOrders(m.getName());
         if (isInOrders != -1) {
+            // this was hardcoded as qty++
+            // which meant that if you said "order add Pizza 4"
+            // and pizza already was in the order array
+            // it would only increase its quantity by 1
             this->items[isInOrders].qty += qty;
         }
         else {
@@ -474,6 +478,9 @@ public:
             }
             OrderItem tempItem;
             tempItem.item = m;
+            // this was hardcoded as 1 instead of qty
+            // so if you typed "order add Pizza 4"
+            // it always pushed 1 pizza into the order anyway
             tempItem.qty = qty;
             temp[this->size] = tempItem;
             this->size++;
@@ -608,9 +615,9 @@ public:
                             
                         }
                         else {
-                            cout << "\n" << "Should throw exception";
+                            cout << "\n" << "Should throw exception\n";
                             string offendingItem = ingredients[k].getName();
-                            string message = "Not enough stock! " + offendingItem + " is not in stock in the desired quanity\n";
+                            string message = "\nNot enough stock! " + offendingItem + " is not in stock in the desired quanity\n";
                             throw new runtime_error(message);
                         }
                     }
@@ -686,6 +693,8 @@ public:
                         cout << "\nYour order is empty! Please add at least one item before ordering!\n";
                     }
                 }
+                // this was being caught with & instead of *
+                // which caused a runtime error uncaught bug
                 catch (runtime_error* e) {
                     cout << e->what();
                     this->orderInstance.emptyOrder();
