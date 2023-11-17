@@ -1,5 +1,6 @@
 #include <iostream>
 #include <sstream> // for istringstream -- might not be needed
+#include <string>
 using namespace std;
 
 // TODO:
@@ -254,7 +255,14 @@ public:
         }
         return out;
     }
-    string getName() const{
+    friend istream& operator>>(istream& in, const MenuItem& m) {
+        string buffer;
+        cout << "\nMenu item name: ";
+        in >> buffer;
+        // m.name = "abcd";
+        return in;
+    }
+    string getName() {
         return name;
     }
     Ingredient* getIngredients() {
@@ -780,9 +788,6 @@ int main()
     Ingredient i5("cheese", 40);
     Ingredient i6("olives", 15);
     Ingredient i7("pineapple", 10);
-    Ingredient i8("nothing", 0);
-    Ingredient i9("nothing", 0);
-    Ingredient i3;
     
     Ingredient si1("flour", 1000);
     Ingredient si2("tomatoes", 500);
@@ -799,80 +804,25 @@ int main()
     stock.push(si4);
     stock.push(si5);
     stock.push(si6);
-    // cout << stock;
-
-    // including a default constructed object in this array leads to a segfault
-    // no idea why -- yes idea why
-    // the copy constructor was wrong
-    // (if other.array was nullptr it still allocated memory instead of setting this.array to nullptr)
 
     Ingredient stuff[] = {i1, i2, i4};
     Ingredient stuff2[] = {i1, i2, i5, i6, i7};
     MenuItem m2("Pizza", stuff, 3);
     MenuItem m3("Hawaii", stuff2, 5);
-    MenuItem m4;
-    // cout << m4;
-    MenuItem m5;
-    cout << m2 << m3;
-    m2 = m3;
-    cout << m2;
-    m3 = m4;
-    cout << m3;
-    // m5 = m4;
-    // cout << m5;
-    // m5 = m3;
-    // cout << m5;
     Menu menu;
     menu.push(m3);
     menu.push(m2);
-    // cout << menu;
 
     Order order;
     order.push(m3, 1);
     order.push(m3, 1);
     order.push(m2, 1);
-    // cout << order;
-
-    // removing the ingredients works, copying into stock doesn't 
-    // cout << stock;
-    
-    // cout << "\n";
-    // cout << order.getItems()[0].item.getIngredients()[0].getName();
-    // cout << "\n";
-
-    // cout << stock.getIngredients()[0].getName();
-    // cout << "\n";
-
-    // if (strcmp(order.getItems()[0].item.getIngredients()[0].getName(), stock.getIngredients()[0].getName()) == 0) {
-    //     cout << "\nThey're equal";
-    // }
-                            
-
-    // cout << order.getItems()[0].item.getIngredients()[0].getQty();
-    // cout << "\n";
-
-    // cout << order.getItems()[0].qty;
-    // cout << "\n";
-    
-    // stock.getIngredients()[0].setQty(stock.getIngredients()[0].getQty() - order.getItems()[0].item.getIngredients()[0].getQty() * order.getItems()[0].qty);
-
-    // cout << stock.getIngredients()[0].getQty();
-    // cout << "\n";
-
-    // Stock newStock = stock.reduceStock(order);
-    // cout << "\n";
-    // cout << newStock;
-    // cout << "\n";
 
     Parser parser(menu, stock, order);
     parser.showCommands();
     while (parser.isRunning()) {
         parser.parseLine();
     }
-
-    Ingredient finTest;
-    cin >> finTest;
-    cout << finTest;
 
     return 0;
 }
